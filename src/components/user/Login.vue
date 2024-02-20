@@ -1,0 +1,126 @@
+<template>
+  <el-container class="login">
+    <el-header>
+      <h1>用户登录</h1>
+    </el-header>
+    <el-main>
+      <el-card>
+        <el-form>
+          <el-form-item label="用户名/邮箱">
+            <el-input placeholder="请输入用户名或邮箱" type="text" v-model="usernameOrEmail"></el-input>
+          </el-form-item>
+          <el-form-item label="密码">
+            <el-input type="password" placeholder="请输入密码" v-model="password"></el-input>
+          </el-form-item>
+          <el-button type="primary" @click="check" :plain="true">登录</el-button>
+          <el-button type="primary">注册</el-button>
+          <el-button link type='info' key="info" class="forget-pwd">忘记密码</el-button>
+        </el-form>
+      </el-card>
+    </el-main>
+  </el-container>
+</template>
+
+<style scoped>
+.login {
+  width: 85vw;
+  height: 50vh;
+  justify-content: center;
+  align-items: center;
+}
+
+.el-card {
+  width: 400px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.forget-pwd {
+  float: right;
+  margin-top: 7px;
+}
+</style>
+
+<script>
+import { ElMessage } from "element-plus";
+import { instance } from "@/utils/request.js";
+import { URL_PREFIX } from "./config";
+import router from "@/router";
+
+export default {
+  data() {
+    return {
+      usernameOrEmail: '',
+      password: ''
+    }
+  },
+  methods: {
+    check() {
+      // true if email, false if username
+      const userType = this.usernameOrEmail.includes('@');
+      // 用户名邮箱验证
+      if (!userType) {
+        if (!isUsernameValid(this.usernameOrEmail)) {
+          return;
+        }
+      } else {
+        if (!isEmailValid(this.usernameOrEmail)) {
+          return;
+        }
+      }
+      // 密码验证
+      if (this.password.length < 6 || this.password.length > 16) {
+        ElMessage.warning('密码长度应在6-16之间')
+        return;
+      }
+     
+        login(this.usernameOrEmail, this.password);
+    }
+  }
+}
+
+const isUsernameValid = username => {
+  if (username.length < 4 || username.length > 16) {
+    ElMessage.warning('用户名长度应在4-16之间')
+    return false
+  }
+  const specialCharacters = "!@#$%^&*()_+{}|:<>?`-=[]\\;',./~";
+  for (const c of username) {
+    if (specialCharacters.includes(c)) {
+      return false;
+    }
+  }
+  return true;
+
+}
+
+const isEmailValid = email => {
+  const emailRegex = /^[a-zA-Z0-9_+&*-]+(?:\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,7}$/;
+  if (!emailRegex.test(email)) {
+    ElMessage.warning('邮箱格式不正确')
+    return false;
+  }
+  return true;
+};
+
+const login = (user, password) => {
+  const formData = new FormData();
+  formData.append('usernameOrEmail', user);
+  formData.append('password', password);
+  instance.post(URL_PREFIX + '/login', formData)
+    .then(response => {
+      if (response.status === 'success') {
+        console.log(response.msg);
+        localStorage.setItem('user', JSON.stringify(response.data));
+        router.push('/home');
+      } else {
+        console.log(response.msg);
+        throw new Error(response.msg);
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+    })
+}
+
+</script>
