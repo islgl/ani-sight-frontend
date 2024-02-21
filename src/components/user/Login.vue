@@ -23,7 +23,7 @@
 
 <style scoped>
 .el-container {
-  width: 85vw;
+  width: 95vw;
   height: 50vh;
   justify-content: center;
   align-items: center;
@@ -33,6 +33,7 @@
   width: 400px;
   margin: 0 auto;
   padding: 20px;
+  justify-content: center;
 }
 
 .text-btn {

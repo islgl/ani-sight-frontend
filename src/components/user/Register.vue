@@ -40,7 +40,7 @@
 
 <style scoped>
 .el-container {
-  width: 85vw;
+  width: 95vw;
   height: 70vh;
   justify-content: center;
   align-items: center;
