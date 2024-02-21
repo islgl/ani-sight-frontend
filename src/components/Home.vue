@@ -1,9 +1,8 @@
 <template>
-    <h1>这是一个测试主页</h1>
+    <h1>This is a test homepage</h1>
 </template>
 
 <script>
 export default {
-    name: 'Home'
 }
 </script>

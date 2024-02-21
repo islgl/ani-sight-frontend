@@ -1,11 +1,11 @@
 <template>
-  <el-container class="login">
+  <el-container>
     <el-header>
       <h1>用户登录</h1>
     </el-header>
     <el-main>
       <el-card>
-        <el-form>
+        <el-form label-width="auto">
           <el-form-item label="用户名/邮箱">
             <el-input placeholder="请输入用户名或邮箱" type="text" v-model="usernameOrEmail"></el-input>
           </el-form-item>
@@ -22,7 +22,7 @@
 </template>
 
 <style scoped>
-.login {
+.el-container {
   width: 85vw;
   height: 50vh;
   justify-content: center;
@@ -39,19 +39,20 @@
   float: right;
   margin-top: 7px;
 }
+
 </style>
 
 <script>
-import { ElMessage } from "element-plus";
-import { instance } from "@/utils/request.js";
-import { URL_PREFIX } from "./config";
+import {ElMessage} from "element-plus";
+import {instance} from "@/utils/request.js";
+import {URL_PREFIX} from "./config";
 import router from "@/router";
 
 export default {
   data() {
     return {
       usernameOrEmail: '',
-      password: ''
+      password: '',
     }
   },
   methods: {
@@ -69,24 +70,34 @@ export default {
         }
       }
       // 密码验证
-      if (this.password.length < 6 || this.password.length > 16) {
-        ElMessage.warning('密码长度应在6-16之间')
+      if (this.password === '') {
+        ElMessage.warning('请输入密码')
         return;
+      } else {
+        if (this.password.length < 6 || this.password.length > 16) {
+          ElMessage.warning('密码长度应在6-16位之间')
+          return;
+        }
       }
-     
-        login(this.usernameOrEmail, this.password);
+      login(this.usernameOrEmail, this.password);
     }
   }
 }
 
 const isUsernameValid = username => {
-  if (username.length < 4 || username.length > 16) {
-    ElMessage.warning('用户名长度应在4-16之间')
+  if (username === '') {
+    ElMessage.warning('请输入用户名或邮箱')
     return false
+  } else {
+    if (username.length < 4 || username.length > 16) {
+      ElMessage.warning('用户名长度应在4-16位之间')
+      return false
+    }
   }
   const specialCharacters = "!@#$%^&*()_+{}|:<>?`-=[]\\;',./~";
   for (const c of username) {
     if (specialCharacters.includes(c)) {
+      ElMessage.warning('用户名不能包含特殊字符')
       return false;
     }
   }
@@ -108,19 +119,19 @@ const login = (user, password) => {
   formData.append('usernameOrEmail', user);
   formData.append('password', password);
   instance.post(URL_PREFIX + '/login', formData)
-    .then(response => {
-      if (response.status === 'success') {
-        console.log(response.msg);
-        localStorage.setItem('user', JSON.stringify(response.data));
-        router.push('/home');
-      } else {
-        console.log(response.msg);
-        throw new Error(response.msg);
-      }
-    })
-    .catch(error => {
-      console.error('Error:', error);
-    })
+      .then(response => {
+        if (response.status === 'success') {
+          console.log(response.msg);
+          localStorage.setItem('user', JSON.stringify(response.data));
+          router.push('/home');
+        } else {
+          console.log(response.msg);
+          throw new Error(response.msg);
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      })
 }
 
 </script>

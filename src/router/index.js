@@ -1,5 +1,5 @@
 import Login from '@/components/user/Login.vue'
-import Home from '@/views/Home.vue'
+import Home from '@/components/Home.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 import { instance } from '@/utils/request'
 
