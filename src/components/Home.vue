@@ -39,30 +39,40 @@
                 :fit="fit"></el-image>
             <el-container>
               <el-upload>
-                <el-button type="primary" class="upload-det-btn">点击上传</el-button>
+                <el-button type="primary" class="upload-det-btn">上传图片</el-button>
               </el-upload>
-              <el-button type="primary" class="upload-det-btn">AI 识别</el-button>
+              <el-container style="margin-top: 30px;margin-left: 50px">
+                <el-form :inline="true">
+                  <el-form-item label="字体颜色">
+                    <el-color-picker v-model="fontColor"/>
+                  </el-form-item>
+                  <el-form-item label="标注框颜色">
+                    <el-color-picker v-model="boxColor"/>
+                  </el-form-item>
+                  <el-form-item>
+                    <el-button type="primary" style="width: 150px">AI 识别</el-button>
+                  </el-form-item>
+                </el-form>
+              </el-container>
             </el-container>
           </el-container>
         </el-col>
         <el-col :span="5">
           <el-card style="width: 90%;height: 100%">
-              <el-container direction="vertical" style="justify-content: center">
-                <el-container style="justify-content: center">
-                  <h3 style="margin-bottom: 20px">图像文本描述</h3>
-                </el-container>
-                <el-card class="caption" style="margin-bottom: 20px;height: 50vh">Lorem ipsum</el-card>
-                <el-container style="justify-content: center">
-                  <el-button type="primary" style="width:200px">复制到剪贴板</el-button>
-                </el-container>
+            <el-container direction="vertical" style="justify-content: center">
+              <el-container style="justify-content: center">
+                <h3 style="margin-bottom: 20px">图像文本描述</h3>
               </el-container>
+              <el-card class="caption" style="margin-bottom: 20px;height: 50vh">Lorem ipsum</el-card>
+              <el-container style="justify-content: center">
+                <el-button type="primary" style="width:200px">复制到剪贴板</el-button>
+              </el-container>
+            </el-container>
           </el-card>
         </el-col>
       </el-row>
     </el-main>
-    <el-footer>
-      <p>Copyright©️2024 演绎法</p>
-    </el-footer>
+
   </el-container>
 </template>
 
@@ -71,7 +81,9 @@ export default {
   data() {
     return {
       url: 'https://cdn.jsdelivr.net/gh/islgl/img-hosting/imgs/202311240050080.png',
-      fit: 'fill'
+      fit: 'fill',
+      fontColor: '#DF7878',
+      boxColor: '#68C768'
     }
   }
 }
@@ -104,16 +116,16 @@ export default {
   margin-top: 30px;
   margin-left: 30px;
   margin-right: 30px;
-  width: 100px;
+  width: 150px;
 }
 
 .thumb-container {
-  margin-bottom: 20px;
+  margin-bottom: 30px;
   align-items: center;
   justify-content: center;
 }
 
-.caption{
+.caption {
   height: 45vh;
 }
 
