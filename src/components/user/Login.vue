@@ -12,9 +12,9 @@
           <el-form-item label="密码">
             <el-input type="password" placeholder="请输入密码" v-model="password"></el-input>
           </el-form-item>
-          <el-button type="primary" @click="check" :plain="true">登录</el-button>
-          <el-button type="primary">注册</el-button>
-          <el-button link type='info' key="info" class="forget-pwd">忘记密码</el-button>
+          <el-button type="primary" @click="checkAndLogin" class="login-btn">登录</el-button>
+          <el-button type="text" class="text-btn">忘记密码</el-button>
+          <el-button type="text" @click="toRegister" class="text-btn">注册</el-button>
         </el-form>
       </el-card>
     </el-main>
@@ -35,9 +35,13 @@
   padding: 20px;
 }
 
-.forget-pwd {
+.text-btn {
   float: right;
-  margin-top: 7px;
+}
+
+.login-btn {
+  margin-left: 40px;
+  width: 100px;
 }
 
 </style>
@@ -56,7 +60,7 @@ export default {
     }
   },
   methods: {
-    check() {
+    checkAndLogin() {
       // true if email, false if username
       const userType = this.usernameOrEmail.includes('@');
       // 用户名邮箱验证
@@ -70,16 +74,13 @@ export default {
         }
       }
       // 密码验证
-      if (this.password === '') {
-        ElMessage.warning('请输入密码')
+      if (!isPasswordValid(this.password)) {
         return;
-      } else {
-        if (this.password.length < 6 || this.password.length > 16) {
-          ElMessage.warning('密码长度应在6-16位之间')
-          return;
-        }
       }
       login(this.usernameOrEmail, this.password);
+    },
+    toRegister() {
+      router.push('/register');
     }
   }
 }
@@ -114,23 +115,31 @@ const isEmailValid = email => {
   return true;
 };
 
+const isPasswordValid = password => {
+  if (password === '') {
+    ElMessage.warning('请输入密码')
+    return false;
+  } else {
+    if (password.length < 6 || password.length > 16) {
+      ElMessage.warning('密码长度应在6-16位之间')
+      return false;
+    }
+  }
+  return true;
+}
+
 const login = (user, password) => {
   const formData = new FormData();
   formData.append('usernameOrEmail', user);
   formData.append('password', password);
   instance.post(URL_PREFIX + '/login', formData)
       .then(response => {
-        if (response.status === 'success') {
-          console.log(response.msg);
-          localStorage.setItem('user', JSON.stringify(response.data));
-          router.push('/home');
-        } else {
-          console.log(response.msg);
-          throw new Error(response.msg);
-        }
+        ElMessage.success("登录成功");
+        localStorage.setItem('user', JSON.stringify(response.data));
+        router.push('/home');
       })
       .catch(error => {
-        console.error('Error:', error);
+        ElMessage.error(error.message);
       })
 }
 

@@ -1,7 +1,8 @@
 import Login from '@/components/user/Login.vue'
 import Home from '@/components/Home.vue'
-import { createRouter, createWebHistory } from 'vue-router'
-import { instance } from '@/utils/request'
+import Register from '@/components/user/Register.vue'
+import {createRouter, createWebHistory} from 'vue-router'
+import {instance} from '@/utils/request'
 
 const routes = [
     {
@@ -13,16 +14,22 @@ const routes = [
         }
     },
     {
-        path: '/login',
-        name: 'login',
-        component: Login
-    }, {
         path: '/home',
         component: Home,
         name: 'home',
         meta: {
             requireAuth: true
         }
+    },
+    {
+        path: '/login',
+        name: 'login',
+        component: Login
+    },
+    {
+        path: '/register',
+        name: 'register',
+        component: Register
     }
 ]
 
@@ -36,7 +43,6 @@ router.beforeEach((to, from, next) => {
         const user = JSON.parse(localStorage.getItem('user'))
         if (user === null) {
             next('/login')
-            return
         } else {
             instance.get('/users/token-valid', {
                 params: {
@@ -44,16 +50,15 @@ router.beforeEach((to, from, next) => {
                 }
             }).then(res => {
                 if (res.status === 'success') {
-                    console.log('Token is valid...')
+                    console.log('Token is valid')
                     next()
                 } else {
-                    console.log('Token is invalid...')
+                    console.warn('Token is invalid')
                     next('/login')
                 }
             }).catch(err => {
-                console.log('Token is error...')
+                console.error(err)
                 next('/login')
-                console.log('go to login...')
             })
         }
     } else {
