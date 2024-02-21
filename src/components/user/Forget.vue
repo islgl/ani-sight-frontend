@@ -1,22 +1,19 @@
 <template>
   <el-container>
     <el-header>
-      <h1>用户注册</h1>
+      <h1>忘记密码</h1>
     </el-header>
     <el-main>
       <el-card>
         <el-form label-width="auto">
-          <el-form-item label="用户名">
-            <el-input placeholder="请输入用户名" type="text" v-model="username"></el-input>
-          </el-form-item>
           <el-form-item label="邮箱">
             <el-input type="text" placeholder="请输入邮箱" v-model="email"></el-input>
           </el-form-item>
-          <el-form-item label="密码">
-            <el-input type="password" placeholder="请输入密码" v-model="password"></el-input>
+          <el-form-item label="新密码">
+            <el-input type="password" placeholder="请输入新密码" v-model="password"></el-input>
           </el-form-item>
-          <el-form-item label="确认密码">
-            <el-input type="password" placeholder="请再次输入密码" v-model="confirmPassword"></el-input>
+          <el-form-item label="确认新密码">
+            <el-input type="password" placeholder="请再次输入新密码" v-model="confirmPassword"></el-input>
           </el-form-item>
           <el-row>
             <el-col span="10">
@@ -31,81 +28,31 @@
             </el-col>
           </el-row>
         </el-form>
-        <el-button type="primary" @click="checkAndRegister" class="register-btn">注册</el-button>
-        <el-button type="text" class="login" @click="toLogin">已有账号？立即登录</el-button>
+        <el-button type="primary" @click="checkAndUpdate" class="update-btn">修改密码</el-button>
+        <el-button type="text" class="login" @click="toLogin">登录</el-button>
       </el-card>
     </el-main>
   </el-container>
 </template>
 
-<style scoped>
-.el-container {
-  width: 85vw;
-  height: 70vh;
-  justify-content: center;
-  align-items: center;
-}
-
-.el-card {
-  width: 450px;
-  margin: 0 auto;
-  padding: 20px;
-}
-
-.el-row {
-  margin-bottom: 20px;
-}
-
-.el-col {
-  border-radius: 4px;
-}
-
-.login {
-  float: right;
-}
-
-.register-btn {
-  margin-left: 50px;
-  width: 100px;
-}
-
-.verify-input {
-  width: 140px;
-}
-
-.get-code-btn {
-  margin-left: 25px;
-  width: 120px;
-}
-
-
-</style>
-
 <script>
+import {instance} from "@/utils/request.js";
 import {ElMessage} from "element-plus";
-import {instance} from "@/utils/request.js"
-import router from "@/router/index.js";
+import router from "@/router";
 
 export default {
   data() {
     return {
-      username: '',
       email: '',
       password: '',
       confirmPassword: '',
       verifyCode: '',
-      count: 0
+      count: 0,
     }
   },
   methods: {
-    checkAndRegister() {
-      if (isUsernameValid(this.username) && isEmailValid(this.email) && isPasswordValid(this.password)
-          && isConfirmPasswordValid(this.password, this.confirmPassword) && isVerifyCodeValid(this.verifyCode)) {
-        register(this.username, this.email, this.password, this.confirmPassword, this.verifyCode)
-      }
-    },
     toLogin() {
-      router.push('/login')
+      router.push('/login');
     },
     getVerifyCode() {
       if (!isEmailValid(this.email)) {
@@ -132,30 +79,15 @@ export default {
         console.log(error);
         ElMessage.error("验证码发送失败，请稍后重试")
       })
-    }
+    },
+    checkAndUpdate() {
+      if (isEmailValid(this.email) && isPasswordValid(this.password) && isConfirmPasswordValid(this.password, this.confirmPassword)
+          && isVerifyCodeValid(this.verifyCode)) {
+        updatePwd(this.email, this.password, this.confirmPassword, this.verifyCode)
+      }
 
-  }
-}
-
-const isUsernameValid = username => {
-  if (username === '') {
-    ElMessage.warning('请输入用户名')
-    return false
-  } else {
-    if (username.length < 4 || username.length > 16) {
-      ElMessage.warning('用户名长度应在4-16位之间')
-      return false
     }
   }
-  const specialCharacters = "!@#$%^&*()_+{}|:<>?`-=[]\\;',./~";
-  for (const c of username) {
-    if (specialCharacters.includes(c)) {
-      ElMessage.warning('用户名不能包含特殊字符')
-      return false;
-    }
-  }
-  return true;
-
 }
 
 const isEmailValid = email => {
@@ -173,7 +105,7 @@ const isEmailValid = email => {
 
 const isPasswordValid = password => {
   if (password === '') {
-    ElMessage.warning('请输入密码')
+    ElMessage.warning('请输入新密码')
     return false;
   } else {
     if (password.length < 6 || password.length > 16) {
@@ -205,19 +137,63 @@ const isVerifyCodeValid = verifyCode => {
   return true;
 }
 
-const register = (username, email, password, confirmPassword, verifyCode) => {
+const updatePwd = (email, password, confirmPassword, verifyCode) => {
   const formData = new FormData();
-  formData.append('username', username);
   formData.append('email', email);
-  formData.append('password', password);
+  formData.append('newPassword', password);
   formData.append('confirmPassword', confirmPassword);
   formData.append('verifyCode', verifyCode);
 
-  instance.post('/users/register', formData).then(response => {
-    ElMessage.success("注册成功，请前往登录");
-    router.push('/login')
+  instance.post('/users/resetpwd', formData).then(response => {
+    ElMessage.success("密码修改成功，请前往登录");
+    router.push('/login');
   }).catch(error => {
-    ElMessage.error(error.message)
+    ElMessage.error(error.message);
   })
 }
+
+
 </script>
+
+<style scoped>
+.el-container {
+  width: 85vw;
+  height: 70vh;
+  justify-content: center;
+  align-items: center;
+}
+
+.el-card {
+  width: 450px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.el-row {
+  margin-bottom: 20px;
+}
+
+.el-col {
+  border-radius: 4px;
+}
+
+.login {
+  float: right;
+  margin-right: 40px;
+}
+
+.update-btn {
+  margin-left: 50px;
+  width: 100px;
+}
+
+.verify-input {
+  width: 140px;
+}
+
+.get-code-btn {
+  margin-left: 25px;
+  width: 120px;
+}
+
+</style>

@@ -1,6 +1,7 @@
 import Login from '@/components/user/Login.vue'
 import Home from '@/components/Home.vue'
 import Register from '@/components/user/Register.vue'
+import Forget from '@/components/user/Forget.vue'
 import {createRouter, createWebHistory} from 'vue-router'
 import {instance} from '@/utils/request'
 
@@ -30,6 +31,11 @@ const routes = [
         path: '/register',
         name: 'register',
         component: Register
+    },
+    {
+        path: '/forget',
+        name: 'forget',
+        component: Forget
     }
 ]
 

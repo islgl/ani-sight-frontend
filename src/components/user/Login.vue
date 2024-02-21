@@ -13,7 +13,7 @@
             <el-input type="password" placeholder="请输入密码" v-model="password"></el-input>
           </el-form-item>
           <el-button type="primary" @click="checkAndLogin" class="login-btn">登录</el-button>
-          <el-button type="text" class="text-btn">忘记密码</el-button>
+          <el-button type="text" class="text-btn" @click="toForget">忘记密码</el-button>
           <el-button type="text" @click="toRegister" class="text-btn">注册</el-button>
         </el-form>
       </el-card>
@@ -81,6 +81,9 @@ export default {
     },
     toRegister() {
       router.push('/register');
+    },
+    toForget() {
+      router.push('/forget');
     }
   }
 }
