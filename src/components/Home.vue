@@ -34,28 +34,27 @@
           <el-card style="width: 99%;height: 100%">
             <el-container direction="vertical">
               <el-container class="thumb-container" direction="vertical">
-                <el-image :src="segUrl">
-                </el-image>
+                <el-image :src="segUrl" fit="contain" />
                 <p>图像分割结果</p>
               </el-container>
               <el-container class="thumb-container" direction="vertical">
-                <el-image :src="oriUrl" />
+                <el-image :src="oriUrl" fit="contain" />
                 <p>原始图像</p>
               </el-container>
               <el-container style="justify-content: center;margin-bottom: 20px">
-                <el-button type="primary" style="width:200px">下载分割结果</el-button>
+                <el-button type="primary" style="width:200px" @click="downloadSegResult">下载分割结果</el-button>
               </el-container>
               <el-container style="justify-content: center">
-                <el-button type="primary" style="width:200px">下载原始图像</el-button>
+                <el-button type="primary" style="width:200px" @click="downloadDetResult">下载识别结果</el-button>
               </el-container>
             </el-container>
           </el-card>
         </el-col>
         <el-col :span="14">
-          <el-container class="image" direction="vertical">
-            <el-image style="width: 765px; height: 450px" :src="mainUrl" fit="fill" />
+          <el-container class="image" direction="vertical" id="main">
+            <el-image style="width: 765px; height: 450px" :src="mainUrl" fit="contain" />
             <el-container>
-              <el-upload :http-request="uploadImage" :multiple="false" :limit="1" :auto-upload="true"
+              <el-upload :http-request="uploadImage" :multiple="false" :auto-upload="true"
                 :before-upload="beforeImageUpload" :on-exceed="onExceed">
                 <el-button type="primary" class="upload-det-btn">上传图片</el-button>
               </el-upload>
@@ -82,10 +81,10 @@
                 <h3 style="margin-bottom: 20px">图像文本描述</h3>
               </el-container>
               <el-card class="caption" style="margin-bottom: 20px;height: 50vh">
-                <p>{{ caption }}</p>
+                <p id="copy">{{ caption }}</p>
               </el-card>
               <el-container style="justify-content: center">
-                <el-button type="primary" style="width:200px">复制到剪贴板</el-button>
+                <el-button type="primary" class="copyBtn" id="copyBtn" data-clipboard-target="#copy">{{ copyBtnVal }}</el-button>
               </el-container>
             </el-container>
           </el-card>
@@ -102,6 +101,7 @@ import router from "@/router";
 import { ElMessage } from "element-plus";
 import { upload, getOssUrl } from "@/utils/oss.js";
 import { instance } from "@/utils/request";
+import Clipboard from 'clipboard';
 
 export default {
   data() {
@@ -113,9 +113,10 @@ export default {
       imageName: '',
       imageId: 0,
       base64: '',
-      caption: 'Lorem ipsum',
+      caption: '请上传图像并识别以获取文本描述',
       fontColor: '#DF7878',
       boxColor: '#68C768',
+      copyBtnVal: '复制到剪贴板',
     }
   },
   methods: {
@@ -167,6 +168,8 @@ export default {
         text: '识别中... 如果是首次识别可能需要较长时间，请耐心等待...',
         spinner: 'el-icon-loading',
         background: 'rgba(0, 0, 0, 0.7)',
+        fullscreen: false,
+        // target: 'main'
       });
 
       const detectData = {
@@ -188,11 +191,12 @@ export default {
         return getOssUrl(this.imageName.split('.')[0] + '.png', 'masks');
       }).then((res) => {
         this.segUrl = res;
-        this.mainUrl = res;
         ElMessage.success('识别成功');
-        return Promise.resolve('Successfully inferenced');
-      })
-        .catch((error) => {
+        return getOssUrl(this.imageName, 'labels');
+      }).then((res) => {
+        this.mainUrl = res;
+        return Promise.resolve('Successfully detected');
+      }).catch((error) => {
           loadingInstance.close();
           console.error(error);
           ElMessage.error('识别失败，请稍后重试');
@@ -206,11 +210,32 @@ export default {
       localStorage.removeItem('sts');
       router.push('/login');
     },
+    downloadSegResult() {
+      if (this.segUrl == 'https://oss.lewisliugl.cn/assets/placeholder.svg') {
+        ElMessage.warning('请先上传图片并识别');
+        return;
+      }
+      const downloadUrl = this.segUrl;
+      const link = document.createElement('a');
+      link.href = downloadUrl;
+      link.click();
+    },
+    downloadDetResult() {
+      if (this.mainUrl == 'https://oss.lewisliugl.cn/assets/banner.svg') {
+        ElMessage.warning('请先上传图片并识别');
+        return;
+      }
+      const downloadUrl = this.mainUrl;
+      const link = document.createElement('a');
+      link.href = downloadUrl;
+      link.click();
+    }
   }
 }
 
 const hex2rgb = hex => {
-  const rgb = [parseInt(hex.slice(1, 3), 16), parseInt(hex.slice(3, 5), 16), parseInt(hex.slice(5, 7), 16)];
+  const bgr = [parseInt(hex.slice(1, 3), 16), parseInt(hex.slice(3, 5), 16), parseInt(hex.slice(5, 7), 16)];
+  const rgb = [bgr[2], bgr[1], bgr[0]];
   return `(${rgb.join(',')})`;
 }
 
@@ -218,13 +243,13 @@ const img2base64 = file => {
   return new Promise((resolve, reject) => {
     let reader = new FileReader()
     let fileResult = ''
-    reader.readAsDataURL(file) //开始转
+    reader.readAsDataURL(file)
     reader.onload = function () {
       fileResult = reader.result
-    } //转 失败
+    }
     reader.onerror = function (error) {
       reject(error)
-    } //转 结束  咱就 resolve 出去
+    }
     reader.onloadend = function () {
       resolve(fileResult)
     }
@@ -236,6 +261,13 @@ const writeInferenceRecord = () => {
 
 }
 
+var clipboard = new Clipboard('.copyBtn');
+clipboard.on('success', function (e) {
+  //注销对象
+  e.clearSelection();
+  ElMessage.success('复制成功');
+  this.copyBtnVal = "复制成功";
+});
 </script>
 
 <style scoped>
@@ -283,5 +315,9 @@ const writeInferenceRecord = () => {
   justify-content: center;
   align-items: center;
   margin-top: 10px;
+}
+
+.copyBtn {
+  width: 200px;
 }
 </style>
