@@ -15,7 +15,7 @@ instance.interceptors.response.use(
     (response) => {
         const data=response.data
         if (data.status === "success") {
-            console.log("Success from response interceptor: ", data)
+            console.log("Success from response interceptor: ")
             return data;
         }
         console.warn("Error from response interceptor: ", data)

@@ -1,12 +1,30 @@
 <template>
   <el-container class="root">
     <el-header>
-      <el-menu mode="horizontal">
-        <el-menu-item index="1">首页</el-menu-item>
-        <el-menu-item index="2">历史记录</el-menu-item>
-        <el-menu-item index="3">我的收藏</el-menu-item>
-        <el-menu-item index="4">关于</el-menu-item>
-      </el-menu>
+      <el-row>
+        <el-col :span="21">
+          <el-menu
+              mode="horizontal"
+              active-text-color="#20a0ff"
+              default-active="1">
+            <el-menu-item index="1" route="/home">首页</el-menu-item>
+            <el-menu-item index="2" route="/login">历史记录</el-menu-item>
+            <el-menu-item index="3" route="/register">我的收藏</el-menu-item>
+            <el-menu-item index="4" route="/forget">关于</el-menu-item>
+          </el-menu>
+        </el-col>
+        <el-col :span="3">
+          <el-container class="avatar-container">
+            <el-avatar
+                size="medium"
+                src="https://cdn.jsdelivr.net/gh/islgl/img-hosting/imgs/furina-logo.png"/>
+            <el-menu mode="horizontal">
+              <el-menu-item index="1" route="/home">个人资料</el-menu-item>
+              <el-menu-item index="2" route="/login">退出</el-menu-item>
+            </el-menu>
+          </el-container>
+        </el-col>
+      </el-row>
     </el-header>
     <el-main>
       <el-row>
@@ -38,7 +56,13 @@
                 :src="url"
                 :fit="fit"></el-image>
             <el-container>
-              <el-upload>
+              <el-upload :http-request="uploadImage"
+                         :multiple="false"
+                         :limit="1"
+                         :auto-upload="true"
+                         :before-upload="beforeImageUpload"
+                         :on-exceed="onExceed"
+              >
                 <el-button type="primary" class="upload-det-btn">上传图片</el-button>
               </el-upload>
               <el-container style="margin-top: 30px;margin-left: 50px">
@@ -77,6 +101,8 @@
 </template>
 
 <script>
+import {uploadImage, beforeImageUpload, onExceed} from "@/utils/upload.js";
+
 export default {
   data() {
     return {
@@ -85,6 +111,11 @@ export default {
       fontColor: '#DF7878',
       boxColor: '#68C768'
     }
+  },
+  methods: {
+    onExceed,
+    beforeImageUpload,
+    uploadImage,
   }
 }
 </script>
@@ -127,6 +158,13 @@ export default {
 
 .caption {
   height: 45vh;
+}
+
+.avatar-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 10px;
 }
 
 </style>
