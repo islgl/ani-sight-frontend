@@ -2,11 +2,11 @@
   <el-container class="root">
     <el-header>
       <el-row>
-        <el-col :span="21">
-          <el-menu
-              mode="horizontal"
-              active-text-color="#20a0ff"
-              default-active="1">
+        <el-col :span="2">
+          <el-image style="width: 100px; margin-top: 15px;" src="https://oss.lewisliugl.cn/assets/logo-title.svg" />
+        </el-col>
+        <el-col :span="19">
+          <el-menu mode="horizontal" active-text-color="#20a0ff" default-active="2">
             <el-menu-item index="1" route="/home">首页</el-menu-item>
             <el-menu-item index="2" route="/login">历史记录</el-menu-item>
             <el-menu-item index="3" route="/register">我的收藏</el-menu-item>
@@ -15,9 +15,7 @@
         </el-col>
         <el-col :span="3">
           <el-container class="avatar-container">
-            <el-avatar
-                size="medium"
-                src="https://cdn.jsdelivr.net/gh/islgl/img-hosting/imgs/furina-logo.png"/>
+            <el-avatar size="medium" :src="avatarUrl" />
             <el-menu mode="horizontal">
               <el-menu-item index="1" route="/home">个人资料</el-menu-item>
               <el-menu-item index="2" route="/login">退出</el-menu-item>
@@ -32,12 +30,12 @@
           <el-card style="width: 99%;height: 100%">
             <el-container direction="vertical">
               <el-container class="thumb-container" direction="vertical">
-                <el-image src="https://cdn.jsdelivr.net/gh/islgl/img-hosting/imgs/202311161708036.jpg">
+                <el-image :src="segUrl">
                 </el-image>
                 <p>图像分割结果</p>
               </el-container>
               <el-container class="thumb-container" direction="vertical">
-                <el-image src="https://cdn.jsdelivr.net/gh/islgl/img-hosting/imgs/202311240050065.png"/>
+                <el-image :src="oriUrl" />
                 <p>原始图像</p>
               </el-container>
               <el-container style="justify-content: center;margin-bottom: 20px">
@@ -51,27 +49,19 @@
         </el-col>
         <el-col :span="14">
           <el-container class="image" direction="vertical">
-            <el-image
-                style="width: 765px; height: 450px"
-                :src="url"
-                :fit="fit"></el-image>
+            <el-image style="width: 765px; height: 450px" :src="mainUrl" :fit="fit" />
             <el-container>
-              <el-upload :http-request="uploadImage"
-                         :multiple="false"
-                         :limit="1"
-                         :auto-upload="true"
-                         :before-upload="beforeImageUpload"
-                         :on-exceed="onExceed"
-              >
+              <el-upload :http-request="uploadImage" :multiple="false" :limit="1" :auto-upload="true"
+                :before-upload="beforeImageUpload" :on-exceed="onExceed">
                 <el-button type="primary" class="upload-det-btn">上传图片</el-button>
               </el-upload>
               <el-container style="margin-top: 30px;margin-left: 50px">
                 <el-form :inline="true">
                   <el-form-item label="字体颜色">
-                    <el-color-picker v-model="fontColor"/>
+                    <el-color-picker v-model="fontColor" />
                   </el-form-item>
                   <el-form-item label="标注框颜色">
-                    <el-color-picker v-model="boxColor"/>
+                    <el-color-picker v-model="boxColor" />
                   </el-form-item>
                   <el-form-item>
                     <el-button type="primary" style="width: 150px">AI 识别</el-button>
@@ -87,7 +77,9 @@
               <el-container style="justify-content: center">
                 <h3 style="margin-bottom: 20px">图像文本描述</h3>
               </el-container>
-              <el-card class="caption" style="margin-bottom: 20px;height: 50vh">Lorem ipsum</el-card>
+              <el-card class="caption" style="margin-bottom: 20px;height: 50vh">
+                <p>{{ caption }}</p>
+              </el-card>
               <el-container style="justify-content: center">
                 <el-button type="primary" style="width:200px">复制到剪贴板</el-button>
               </el-container>
@@ -101,13 +93,17 @@
 </template>
 
 <script>
-import {uploadImage, beforeImageUpload, onExceed} from "@/utils/upload.js";
+import { uploadImage, beforeImageUpload, onExceed } from "@/utils/upload.js";
 
 export default {
   data() {
     return {
-      url: 'https://cdn.jsdelivr.net/gh/islgl/img-hosting/imgs/202311240050080.png',
+      mainUrl: 'https://oss.lewisliugl.cn/assets/banner.svg',
+      segUrl: 'https://oss.lewisliugl.cn/assets/placeholder.svg',
+      oriUrl: 'https://oss.lewisliugl.cn/assets/placeholder.svg',
+      avatarUrl: 'https://oss.lewisliugl.cn/avatar/default.svg',
       fit: 'fill',
+      caption: 'Lorem ipsum',
       fontColor: '#DF7878',
       boxColor: '#68C768'
     }
@@ -166,5 +162,4 @@ export default {
   align-items: center;
   margin-top: 10px;
 }
-
 </style>
