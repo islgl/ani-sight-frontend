@@ -1,10 +1,9 @@
 import axios from "axios";
-import {ElMessage} from "element-plus";
 
 const BASE_URL = '/api';
 export const instance = axios.create({
     baseURL: BASE_URL,
-    timeout: 10000,
+    timeout: 60000,
     // headers: {
     //     'Content-Type': 'application/json',
     // },
@@ -13,8 +12,9 @@ export const instance = axios.create({
 // 响应拦截器
 instance.interceptors.response.use(
     (response) => {
-        const data=response.data
-        if (data.status === "success") {
+        const data = response.data
+
+        if (data.status === "success"||data.data.caption) {
             console.log("Success from response interceptor: ")
             return data;
         }

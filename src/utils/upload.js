@@ -1,8 +1,8 @@
-import {upload} from "@/utils/oss.js";
 import {ElMessage} from "element-plus";
 import {instance} from "@/utils/request.js";
 
 export const beforeImageUpload = (file) => {
+    console.log('file: ', file);
     const suffix = file.name.split('.').pop();
     if (suffix !== 'jpg' && suffix !== 'jpeg' && suffix !== 'png') {
         console.error('Invalid image format')
@@ -17,7 +17,7 @@ export const onExceed = (files, fileList) => {
     return false;
 }
 
-const renameImage = () => {
+export const renameImage = () => {
     let user = localStorage.getItem('user');
     if (!user) {
         console.warn("No valid user information found in localStorage");
@@ -29,7 +29,7 @@ const renameImage = () => {
     return uid + '-' + now + '-' + random;
 }
 
-const writeRecord = filename => {
+export const writeUploadRecord = filename => {
     const user = JSON.parse(localStorage.getItem('user'));
     if (!user) {
         console.warn("No valid user information found in localStorage");
@@ -40,29 +40,10 @@ const writeRecord = filename => {
     formData.append('uid', uid);
     formData.append('name', filename);
     return instance.post('/images', formData).then((res) => {
-        return Promise.resolve('上传成功');
+        return res.data;
     }).catch((error) => {
         console.error('Failed to write image record: ', error);
         return Promise.reject('上传失败，请稍后重试');
     });
 }
 
-
-export const uploadImage = (item) => {
-    const file = item.file;
-    // 获取文件后缀
-    const suffix = file.name.split('.').pop();
-    const filename = renameImage() + '.' + suffix;
-    const dir = 'images/';
-    return upload(filename, dir, file).then((res) => {
-        return writeRecord(filename);
-    }).then((res) => {
-        ElMessage.success('上传成功');
-        return Promise.resolve('Successfully uploaded image');
-    }).catch((error) => {
-            console.error(error);
-            ElMessage.error('上传失败，请稍后重试');
-            return Promise.reject(error);
-        });
-
-}
