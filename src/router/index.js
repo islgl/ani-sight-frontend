@@ -2,6 +2,10 @@ import Login from '@/components/user/Login.vue'
 import Home from '@/components/Home.vue'
 import Register from '@/components/user/Register.vue'
 import Forget from '@/components/user/Forget.vue'
+import Profile from "@/components/user/Profile.vue";
+import History from "@/components/data/History.vue";
+import Star from "@/components/data/Star.vue";
+import About from "@/components/About.vue";
 import {createRouter, createWebHistory} from 'vue-router'
 import {instance} from '@/utils/request'
 
@@ -36,6 +40,32 @@ const routes = [
         path: '/forget',
         name: 'forget',
         component: Forget
+    },
+    {
+        path: '/profile',
+        name:'profile',
+        component: Profile
+    },
+    {
+        path: '/history',
+        name:'history',
+        component: History,
+        meta: {
+            requireAuth: true
+        }
+    },
+    {
+        path: '/star',
+        name:'star',
+        component: Star,
+        meta: {
+            requireAuth: true
+        }
+    },
+    {
+        path: '/about',
+        name:'about',
+        component: About
     }
 ]
 
@@ -69,6 +99,14 @@ router.beforeEach((to, from, next) => {
         }
     } else {
         next()
+    }
+
+    // 主页初始化
+    if(to.name === 'root'||to.name === 'home') {
+        const user = JSON.parse(localStorage.getItem('user'))
+        if (user !== null) {
+            const uid=user.uid
+        }
     }
 })
 

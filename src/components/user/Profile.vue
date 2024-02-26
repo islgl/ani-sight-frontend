@@ -1,0 +1,138 @@
+<template>
+  <el-container class="root">
+    <el-header>
+      <el-row>
+        <el-col :span="2">
+          <el-image style="width: 100px; margin-top: 15px;" src="https://oss.lewisliugl.cn/assets/logo-title.svg"/>
+        </el-col>
+        <el-col :span="19">
+          <el-menu mode="horizontal" active-text-color="#20a0ff" router>
+            <el-menu-item index="1" route="/home">首页</el-menu-item>
+            <el-menu-item index="2" route="/history">历史记录</el-menu-item>
+            <el-menu-item index="3" route="/star">我的收藏</el-menu-item>
+            <el-menu-item index="4" route="/about">关于</el-menu-item>
+          </el-menu>
+        </el-col>
+        <el-col :span="3">
+          <el-container class="avatar-container">
+            <el-avatar size="medium" :src="avatarUrl"/>
+            <el-menu mode="horizontal" :ellipsis="false" style="border-bottom: none" @select="index => {
+              if (index === '5-2') {
+                this.logout();
+              }
+            }" router>
+              <el-sub-menu>
+                <template #title>{{username}}</template>
+                <el-menu-item index="5-1" route="/profile">个人资料</el-menu-item>
+                <el-menu-item index="5-2">退出</el-menu-item>
+              </el-sub-menu>
+            </el-menu>
+          </el-container>
+        </el-col>
+      </el-row>
+    </el-header>
+    <el-main>
+      <el-container class="profile-container">
+        <el-col span="4" class="avatar-col">
+          <el-container direction="vertical" class="avatar-container">
+            <el-avatar src="https://cdn.jsdelivr.net/gh/islgl/img-hosting/imgs/furina-logo.png"
+                       style="width: 200px;height: 200px"/>
+            <el-button type="primary" style="margin-top: 50px;width: 100px;" class="update-avatar-btn">修改头像
+            </el-button>
+          </el-container>
+        </el-col>
+        <el-col span="20">
+          <el-form label-position="top" style="margin-left: 100px">
+            <el-form-item label="UID">
+                <p style="text-decoration: underline; font-size: 15px;">{{ uid }}</p>
+              </el-form-item>
+            <el-form-item label="用户名">
+              <el-input v-model="username" size="large" class="profile-input"/>
+              <el-button type="success" class="update-profile-btn">修改用户名</el-button>
+            </el-form-item>
+            <el-form-item label="邮箱">
+              <el-input v-model="email" size="large" class="profile-input"/>
+              <el-button type="success" class="update-profile-btn">修改邮箱</el-button>
+            </el-form-item>
+            <el-button type="danger" style="margin-top: 30px">注销账户</el-button>
+          </el-form>
+        </el-col>
+
+      </el-container>
+    </el-main>
+  </el-container>
+</template>
+<script>
+import {logout} from "@/utils/utils.js";
+
+export default {
+  data() {
+    return {
+      mainUrl: 'https://oss.lewisliugl.cn/assets/banner.svg',
+      avatarUrl: 'https://oss.lewisliugl.cn/avatar/default.svg',
+      username: '用户',
+      email: 'email',    
+      uid: 0,
+    }
+  },
+  mounted() {
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (user) {
+      this.avatarUrl = user.avatar;
+      this.uid = user.uid;
+      this.username = user.username;
+      this.email = user.email;
+    }
+  },
+  methods: {
+    logout,
+  }
+}
+</script>
+
+<style scoped>
+* {
+  overflow: hidden;
+}
+
+.root {
+  height: 100vh;
+  width: 100vw;
+}
+
+.avatar-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.profile-container {
+  display: flex;
+  margin-top: 100px;
+  margin-left: 200px;
+}
+
+.avatar-col {
+  margin-left: 100px;
+}
+
+.profile-input {
+  width: 300px;
+}
+
+.update-profile-btn {
+  margin-left: 20px;
+  width: 120px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.profile-title{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+</style>

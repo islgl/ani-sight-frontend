@@ -6,23 +6,26 @@
           <el-image style="width: 100px; margin-top: 15px;" src="https://oss.lewisliugl.cn/assets/logo-title.svg" />
         </el-col>
         <el-col :span="19">
-          <el-menu mode="horizontal" active-text-color="#20a0ff" default-active="1">
+          <el-menu mode="horizontal" active-text-color="#20a0ff" default-active="1" router>
             <el-menu-item index="1" route="/home">首页</el-menu-item>
-            <el-menu-item index="2" route="/login">历史记录</el-menu-item>
-            <el-menu-item index="3" route="/register">我的收藏</el-menu-item>
-            <el-menu-item index="4" route="/forget">关于</el-menu-item>
+            <el-menu-item index="2" route="/history">历史记录</el-menu-item>
+            <el-menu-item index="3" route="/star">我的收藏</el-menu-item>
+            <el-menu-item index="4" route="/about">关于</el-menu-item>
           </el-menu>
         </el-col>
         <el-col :span="3">
           <el-container class="avatar-container">
             <el-avatar size="medium" :src="avatarUrl" />
-            <el-menu mode="horizontal" @select="index => {
-              if (index === '2') {
+            <el-menu mode="horizontal" :ellipsis="false" style="border-bottom: none" @select="index => {
+              if (index === '5-2') {
                 this.logout();
               }
-            }">
-              <el-menu-item index="1" route="/home">个人资料</el-menu-item>
-              <el-menu-item index="2">退出</el-menu-item>
+            }" router>
+              <el-sub-menu>
+                <template #title>{{username}}</template>
+                <el-menu-item index="5-1" route="/profile">个人资料</el-menu-item>
+                <el-menu-item index="5-2">退出</el-menu-item>
+              </el-sub-menu>
             </el-menu>
           </el-container>
         </el-col>
@@ -84,14 +87,14 @@
                 <p id="copy">{{ caption }}</p>
               </el-card>
               <el-container style="justify-content: center">
-                <el-button type="primary" class="copyBtn" id="copyBtn" data-clipboard-target="#copy">{{ copyBtnVal }}</el-button>
+                <el-button type="primary" class="copyBtn" id="copyBtn" data-clipboard-target="#copy">{{ copyBtnVal
+                }}</el-button>
               </el-container>
             </el-container>
           </el-card>
         </el-col>
       </el-row>
     </el-main>
-
   </el-container>
 </template>
 
@@ -102,6 +105,7 @@ import { ElMessage } from "element-plus";
 import { upload, getOssUrl } from "@/utils/oss.js";
 import { instance } from "@/utils/request";
 import Clipboard from 'clipboard';
+import { logout } from "@/utils/utils.js";
 
 export default {
   data() {
@@ -110,6 +114,7 @@ export default {
       segUrl: 'https://oss.lewisliugl.cn/assets/placeholder.svg',
       oriUrl: 'https://oss.lewisliugl.cn/assets/placeholder.svg',
       avatarUrl: 'https://oss.lewisliugl.cn/avatar/default.svg',
+      username: '用户',
       imageName: '',
       imageId: 0,
       base64: '',
@@ -197,19 +202,15 @@ export default {
         this.mainUrl = res;
         return Promise.resolve('Successfully detected');
       }).catch((error) => {
-          loadingInstance.close();
-          console.error(error);
-          ElMessage.error('识别失败，请稍后重试');
-          return Promise.reject(error);
-        });
+        loadingInstance.close();
+        console.error(error);
+        ElMessage.error('识别失败，请稍后重试');
+        return Promise.reject(error);
+      });
 
 
     },
-    logout() {
-      localStorage.removeItem('user');
-      localStorage.removeItem('sts');
-      router.push('/login');
-    },
+    logout,
     downloadSegResult() {
       if (this.segUrl == 'https://oss.lewisliugl.cn/assets/placeholder.svg') {
         ElMessage.warning('请先上传图片并识别');
@@ -229,6 +230,15 @@ export default {
       const link = document.createElement('a');
       link.href = downloadUrl;
       link.click();
+    },
+
+
+  },
+  mounted() {
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (user) {
+      this.avatarUrl = user.avatar;
+      this.username = user.username;
     }
   }
 }
