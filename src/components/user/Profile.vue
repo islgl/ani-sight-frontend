@@ -22,7 +22,7 @@
               }
             }" router>
               <el-sub-menu>
-                <template #title>{{ username }}</template>
+                <template #title>{{ usernameInStorage }}</template>
                 <el-menu-item index="5-1" route="/profile">个人资料</el-menu-item>
                 <el-menu-item index="5-2">退出</el-menu-item>
               </el-sub-menu>
@@ -36,7 +36,7 @@
         <el-col span="4" class="avatar-col">
           <el-container direction="vertical" class="avatar-container">
             <el-avatar :src="avatarUrl" style="width: 200px;height: 200px"/>
-            <el-upload :http-request="updateAvatar" :auto-upload="true">
+            <el-upload :http-request="updateAvatar" :auto-upload="true" :show-file-list="false">
               <el-button type="primary" style="margin-top: 50px;width: 100px;" class="update-avatar-btn">修改头像
               </el-button>
             </el-upload>
@@ -49,16 +49,27 @@
             </el-form-item>
             <el-form-item label="用户名">
               <el-input v-model="username" size="large" class="profile-input"/>
-              <el-button type="success" class="update-profile-btn">修改用户名</el-button>
+              <el-button type="success" class="update-profile-btn" @click="updateUsername">修改用户名</el-button>
             </el-form-item>
             <el-form-item label="邮箱">
               <el-input v-model="email" size="large" class="profile-input"/>
-              <el-button type="success" class="update-profile-btn">修改邮箱</el-button>
+              <el-button type="success" class="update-profile-btn" @click="showNewEmailDialog">修改邮箱
+              </el-button>
             </el-form-item>
-            <el-button type="danger" style="margin-top: 30px">注销账户</el-button>
+            <el-button type="danger" style="margin-top: 30px" @click="delDialogVisible=true">注销账户</el-button>
           </el-form>
         </el-col>
-
+        <el-dialog v-model="newEmailDialogVisible" title="验证新邮箱" width="300px">
+          <el-form>
+            <el-form-item label="邮箱验证码">
+              <el-input type="text" placeholder="请输入验证码" v-model="verifyCode"></el-input>
+            </el-form-item>
+            <el-button type="primary" :disabled="count>0" @click="getVerifyCode">
+              获取验证码{{ count > 0 ? '(' + count + ')' : '' }}
+            </el-button>
+            <el-button type="primary" @click="updateEmail" style="float: right">确认</el-button>
+          </el-form>
+        </el-dialog>
       </el-container>
     </el-main>
   </el-container>
@@ -69,6 +80,7 @@ import {logout} from "@/utils/utils.js";
 import {instance} from "@/utils/request";
 import {ElMessage} from "element-plus";
 
+
 export default {
   data() {
     return {
@@ -77,6 +89,11 @@ export default {
       username: '用户',
       email: 'email',
       uid: 0,
+      usernameInStorage: '用户',
+      count: 0,
+      verifyCode: '',
+      newEmailDialogVisible: false,
+      delDialogVisible: false
     }
   },
   mounted() {
@@ -85,6 +102,7 @@ export default {
       this.avatarUrl = user.avatar;
       this.uid = user.uid;
       this.username = user.username;
+      this.usernameInStorage = user.username;
       this.email = user.email;
     }
   },
@@ -100,7 +118,9 @@ export default {
         const user = JSON.parse(localStorage.getItem('user'));
         user.avatar = res.url;
         localStorage.setItem('user', JSON.stringify(user));
-        return updateProfile(this.uid, 'avatar', filename);
+        return updateProfile(this.uid, 'avatar', {
+          value: filename
+        });
       }).then((res) => {
         ElMessage.success('头像更新成功');
         console.log(res);
@@ -108,21 +128,127 @@ export default {
         console.error(err);
         ElMessage.error('头像更新失败');
       })
+    },
+    updateUsername() {
+      const user = JSON.parse(localStorage.getItem('user'));
+      const currentUsername = user.username;
+      if (this.username === currentUsername) {
+        ElMessage.warning('用户名未改变');
+        return;
+      }
+      if (isUsernameValid(this.username)) {
+        updateProfile(this.uid, 'username', {
+          value: this.username
+        }).then((res) => {
+          ElMessage.success('用户名更新成功');
+          user.username = this.username;
+          this.usernameInStorage = this.username;
+          localStorage.setItem('user', JSON.stringify(user));
+        }).catch((err) => {
+          console.error(err);
+          ElMessage.error('用户名更新失败');
+        })
+      }
+    },
+    showNewEmailDialog() {
+      const user = JSON.parse(localStorage.getItem('user'));
+      const currentEmail = user.email;
+      if (this.email === currentEmail) {
+        ElMessage.warning('邮箱未改变');
+        return;
+      }
+      if (isEmailValid(this.email)) {
+        this.newEmailDialogVisible = true;
+      }
+    },
+    updateEmail() {
+      const user = JSON.parse(localStorage.getItem('user'));
+      updateProfile(this.uid, 'email', {
+        value: this.email,
+        verifyCode: this.verifyCode
+      }).then((res) => {
+        ElMessage.success('邮箱更新成功');
+        user.email = this.email;
+        localStorage.setItem('user', JSON.stringify(user));
+        this.newEmailDialogVisible = false;
+      }).catch((err) => {
+        console.error(err);
+        ElMessage.error(err);
+      })
+      this.verifyCode = '';
+    },
+    getVerifyCode() {
+      if (!isEmailValid(this.email)) {
+        return;
+      }
+      instance.get('/users/email-verify', {
+        params: {
+          email: this.email
+        }
+      }).then(response => {
+        if (response.status === 'success') {
+          console.log(response.message);
+          ElMessage.success("验证码已发送至邮箱，5min内有效");
+          // 禁用按钮1min
+          this.count = 60;
+          const timer = setInterval(() => {
+            this.count--;
+            if (this.count === 0) {
+              clearInterval(timer);
+            }
+          }, 1000)
+        }
+      }).catch(error => {
+        console.log(error);
+        ElMessage.error("验证码发送失败，请稍后重试")
+      })
     }
   }
 }
 
 const updateProfile = (uid, field, data) => {
-  instance.put('/users' + '/' + uid + '/' + field, data,{
-    headers: {
-      'Content-Type': 'application/json'
-    }
-  }).then((res) => {
+  return instance.put('/users' + '/' + uid + '/' + field, data).then((res) => {
     console.log(res);
+    return Promise.resolve();
   }).catch((err) => {
     console.error(err);
+    return Promise.reject(err);
   })
 }
+
+const isUsernameValid = username => {
+  if (username === '') {
+    ElMessage.warning('请输入用户名')
+    return false
+  } else {
+    if (username.length < 4 || username.length > 16) {
+      ElMessage.warning('用户名长度应在4-16位之间')
+      return false
+    }
+  }
+  const specialCharacters = "!@#$%^&*()_+{}|:<>?`-=[]\\;',./~ ";
+  for (const c of username) {
+    if (specialCharacters.includes(c)) {
+      ElMessage.warning('用户名不能包含特殊字符')
+      return false;
+    }
+  }
+  return true;
+
+}
+
+const isEmailValid = email => {
+  if (email === '') {
+    ElMessage.warning('请输入邮箱')
+    return false;
+  }
+  const emailRegex = /^[a-zA-Z0-9_+&*-]+(?:\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,7}$/;
+  if (!emailRegex.test(email)) {
+    ElMessage.warning('邮箱格式不正确')
+    return false;
+  }
+  return true;
+};
 </script>
 
 <style scoped>

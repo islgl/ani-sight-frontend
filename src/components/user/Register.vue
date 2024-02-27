@@ -147,7 +147,7 @@ const isUsernameValid = username => {
       return false
     }
   }
-  const specialCharacters = "!@#$%^&*()_+{}|:<>?`-=[]\\;',./~";
+  const specialCharacters = "!@#$%^&*()_+{}|:<>?`-=[]\\;',./~ ";
   for (const c of username) {
     if (specialCharacters.includes(c)) {
       ElMessage.warning('用户名不能包含特殊字符')
