@@ -81,8 +81,7 @@ export default {
       })
     },
     checkAndUpdate() {
-      if (isEmailValid(this.email) && isPasswordValid(this.password) && isConfirmPasswordValid(this.password, this.confirmPassword)
-          && isVerifyCodeValid(this.verifyCode)) {
+      if (isEmailValid(this.email) && isPasswordValid(this.password) && isConfirmPasswordValid(this.password, this.confirmPassword)) {
         updatePwd(this.email, this.password, this.confirmPassword, this.verifyCode)
       }
 

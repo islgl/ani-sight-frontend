@@ -56,7 +56,10 @@
               <el-button type="success" class="update-profile-btn" @click="showNewEmailDialog">修改邮箱
               </el-button>
             </el-form-item>
-            <el-button type="danger" style="margin-top: 30px" @click="delDialogVisible=true">注销账户</el-button>
+            <el-button type="warning" style="margin-top: 30px" @click="showUpdatePwdDialog">修改密码</el-button>
+            <el-button type="danger" style="margin-top: 30px;margin-left: 50px" @click="showDelDialog">
+              注销账户
+            </el-button>
           </el-form>
         </el-col>
         <el-dialog v-model="newEmailDialogVisible" title="验证新邮箱" width="300px">
@@ -68,6 +71,38 @@
               获取验证码{{ count > 0 ? '(' + count + ')' : '' }}
             </el-button>
             <el-button type="primary" @click="updateEmail" style="float: right">确认</el-button>
+          </el-form>
+        </el-dialog>
+
+        <el-dialog v-model="delDialogVisible" title="注销账户" width="400px">
+          <el-alert
+              title="注销账户后，您的所有数据将被清除，且无法恢复"
+              type="error"
+              show-icon
+              :closable="false"
+          />
+          <el-form-item label="验证邮箱" style="margin-top: 10px">
+            <el-input type="text" placeholder="请输入验证码" v-model="verifyCode"></el-input>
+          </el-form-item>
+          <el-button type="primary" :disabled="count>0" @click="getVerifyCode">
+            获取验证码{{ count > 0 ? '(' + count + ')' : '' }}
+          </el-button>
+          <el-button type="danger" @click="deleteUser" style="float: right">确认注销</el-button>
+        </el-dialog>
+
+        <el-dialog v-model="updatePwdDialogVisible" title="修改密码" width="400px">
+          <el-form label-position="right"
+                   label-width="100px">
+            <el-form-item label="旧密码">
+              <el-input type="password" placeholder="请输入旧密码" v-model="oldPwd"></el-input>
+            </el-form-item>
+            <el-form-item label="新密码">
+              <el-input type="password" placeholder="请输入新密码" v-model="newPwd"></el-input>
+            </el-form-item>
+            <el-form-item label="确认新密码">
+              <el-input type="password" placeholder="请再次输入新密码" v-model="confirmPwd"></el-input>
+            </el-form-item>
+            <el-button type="primary" @click="updatePwd" style="margin-left: 140px">确认修改</el-button>
           </el-form>
         </el-dialog>
       </el-container>
@@ -93,7 +128,11 @@ export default {
       count: 0,
       verifyCode: '',
       newEmailDialogVisible: false,
-      delDialogVisible: false
+      delDialogVisible: false,
+      updatePwdDialogVisible: false,
+      oldPwd: '',
+      newPwd: '',
+      confirmPwd: ''
     }
   },
   mounted() {
@@ -126,7 +165,7 @@ export default {
         console.log(res);
       }).catch((err) => {
         console.error(err);
-        ElMessage.error('头像更新失败');
+        ElMessage.error(err);
       })
     },
     updateUsername() {
@@ -146,7 +185,7 @@ export default {
           localStorage.setItem('user', JSON.stringify(user));
         }).catch((err) => {
           console.error(err);
-          ElMessage.error('用户名更新失败');
+          ElMessage.error(err);
         })
       }
     },
@@ -158,8 +197,19 @@ export default {
         return;
       }
       if (isEmailValid(this.email)) {
+        this.verifyCode = '';
         this.newEmailDialogVisible = true;
       }
+    },
+    showUpdatePwdDialog() {
+      this.newPwd = '';
+      this.confirmPwd = '';
+      this.oldPwd = '';
+      this.updatePwdDialogVisible = true;
+    },
+    showDelDialog() {
+      this.verifyCode = '';
+      this.delDialogVisible = true;
     },
     updateEmail() {
       const user = JSON.parse(localStorage.getItem('user'));
@@ -202,6 +252,43 @@ export default {
         console.log(error);
         ElMessage.error("验证码发送失败，请稍后重试")
       })
+    },
+    deleteUser() {
+      if (this.verifyCode === '' || this.verifyCode === null) {
+        ElMessage.warning('请输入验证码');
+        return;
+      }
+      const user = JSON.parse(localStorage.getItem('user'));
+      instance.delete('/users/signout', {
+        params: {
+          uid: user.uid,
+          verifyCode: this.verifyCode
+        }
+      }).then((res) => {
+        ElMessage.success('账户注销成功');
+        logout();
+      }).catch((err) => {
+        console.error(err);
+        ElMessage.error(err);
+      })
+    },
+    updatePwd() {
+      if (isPasswordValid(this.newPwd) && isConfirmPasswordValid(this.newPwd, this.confirmPwd) && isPasswordValid(this.oldPwd)) {
+        const user = JSON.parse(localStorage.getItem('user'));
+        let formData = new FormData();
+        formData.append('uid', user.uid);
+        formData.append('oldPwd', this.oldPwd);
+        formData.append('newPwd', this.newPwd);
+        formData.append('confirmPwd', this.confirmPwd);
+        instance.put('/users/update-pwd', formData).then((res) => {
+          console.log(res);
+          ElMessage.success('密码修改成功，请重新登录');
+          logout();
+        }).catch((err) => {
+          console.error(err);
+          ElMessage.error(err);
+        })
+      }
     }
   }
 }
@@ -248,7 +335,32 @@ const isEmailValid = email => {
     return false;
   }
   return true;
-};
+}
+
+const isPasswordValid = password => {
+  if (password === '') {
+    ElMessage.warning('请输入密码')
+    return false;
+  } else {
+    if (password.length < 6 || password.length > 16) {
+      ElMessage.warning('密码长度应在6-16位之间')
+      return false;
+    }
+  }
+  return true;
+}
+
+const isConfirmPasswordValid = (password, confirmPassword) => {
+  if (confirmPassword === '') {
+    ElMessage.warning('请再次输入密码')
+    return false;
+  }
+  if (password !== confirmPassword) {
+    ElMessage.warning('两次输入的密码不一致')
+    return false;
+  }
+  return true;
+}
 </script>
 
 <style scoped>

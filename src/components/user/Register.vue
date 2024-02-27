@@ -100,7 +100,7 @@ export default {
   methods: {
     checkAndRegister() {
       if (isUsernameValid(this.username) && isEmailValid(this.email) && isPasswordValid(this.password)
-          && isConfirmPasswordValid(this.password, this.confirmPassword) && isVerifyCodeValid(this.verifyCode)) {
+          && isConfirmPasswordValid(this.password, this.confirmPassword)) {
         register(this.username, this.email, this.password, this.confirmPassword, this.verifyCode)
       }
     },
