@@ -22,7 +22,7 @@
               }
             }" router>
               <el-sub-menu>
-                <template #title>{{username}}</template>
+                <template #title>{{ username }}</template>
                 <el-menu-item index="5-1" route="/profile">个人资料</el-menu-item>
                 <el-menu-item index="5-2">退出</el-menu-item>
               </el-sub-menu>
@@ -35,17 +35,18 @@
       <el-container class="profile-container">
         <el-col span="4" class="avatar-col">
           <el-container direction="vertical" class="avatar-container">
-            <el-avatar src="https://cdn.jsdelivr.net/gh/islgl/img-hosting/imgs/furina-logo.png"
-                       style="width: 200px;height: 200px"/>
-            <el-button type="primary" style="margin-top: 50px;width: 100px;" class="update-avatar-btn">修改头像
-            </el-button>
+            <el-avatar :src="avatarUrl" style="width: 200px;height: 200px"/>
+            <el-upload :http-request="updateAvatar" :auto-upload="true">
+              <el-button type="primary" style="margin-top: 50px;width: 100px;" class="update-avatar-btn">修改头像
+              </el-button>
+            </el-upload>
           </el-container>
         </el-col>
         <el-col span="20">
           <el-form label-position="top" style="margin-left: 100px">
             <el-form-item label="UID">
-                <p style="text-decoration: underline; font-size: 15px;">{{ uid }}</p>
-              </el-form-item>
+              <p style="text-decoration: underline; font-size: 15px;">{{ uid }}</p>
+            </el-form-item>
             <el-form-item label="用户名">
               <el-input v-model="username" size="large" class="profile-input"/>
               <el-button type="success" class="update-profile-btn">修改用户名</el-button>
@@ -63,7 +64,10 @@
   </el-container>
 </template>
 <script>
+import {upload} from "@/utils/oss";
 import {logout} from "@/utils/utils.js";
+import {instance} from "@/utils/request";
+import {ElMessage} from "element-plus";
 
 export default {
   data() {
@@ -71,7 +75,7 @@ export default {
       mainUrl: 'https://oss.lewisliugl.cn/assets/banner.svg',
       avatarUrl: 'https://oss.lewisliugl.cn/avatar/default.svg',
       username: '用户',
-      email: 'email',    
+      email: 'email',
       uid: 0,
     }
   },
@@ -86,7 +90,38 @@ export default {
   },
   methods: {
     logout,
+    updateAvatar(item) {
+      const file = item.file;
+      const suffix = file.name.split('.').pop();
+      const filename = this.uid + '.' + suffix;
+      const dir = 'avatar';
+      return upload(filename, dir, file).then((res) => {
+        this.avatarUrl = res.url;
+        const user = JSON.parse(localStorage.getItem('user'));
+        user.avatar = res.url;
+        localStorage.setItem('user', JSON.stringify(user));
+        return updateProfile(this.uid, 'avatar', filename);
+      }).then((res) => {
+        ElMessage.success('头像更新成功');
+        console.log(res);
+      }).catch((err) => {
+        console.error(err);
+        ElMessage.error('头像更新失败');
+      })
+    }
   }
+}
+
+const updateProfile = (uid, field, data) => {
+  instance.put('/users' + '/' + uid + '/' + field, data,{
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  }).then((res) => {
+    console.log(res);
+  }).catch((err) => {
+    console.error(err);
+  })
 }
 </script>
 
@@ -129,10 +164,9 @@ export default {
   align-items: center;
 }
 
-.profile-title{
+.profile-title {
   display: flex;
   justify-content: center;
   align-items: center;
 }
-
 </style>

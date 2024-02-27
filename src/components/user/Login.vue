@@ -143,6 +143,7 @@ const login = (user, password) => {
         router.push('/home');
       })
       .catch(error => {
+        console.error(error);
         ElMessage.error(error.message);
       })
 }

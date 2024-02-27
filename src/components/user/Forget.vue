@@ -76,7 +76,7 @@ export default {
           }, 1000)
         }
       }).catch(error => {
-        console.log(error);
+        console.error(error);
         ElMessage.error("验证码发送失败，请稍后重试")
       })
     },

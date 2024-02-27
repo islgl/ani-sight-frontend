@@ -44,7 +44,10 @@ const routes = [
     {
         path: '/profile',
         name:'profile',
-        component: Profile
+        component: Profile,
+        meta: {
+            requireAuth: false
+        }
     },
     {
         path: '/history',

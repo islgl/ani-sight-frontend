@@ -14,7 +14,7 @@ instance.interceptors.response.use(
     (response) => {
         const data = response.data
 
-        if (data.status === "success"||data.data.caption) {
+        if (data.status === "success") {
             console.log("Success from response interceptor: ")
             return data;
         }
