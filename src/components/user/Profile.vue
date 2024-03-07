@@ -8,9 +8,6 @@
         <el-col :span="19">
           <el-menu mode="horizontal" active-text-color="#20a0ff" router>
             <el-menu-item index="1" route="/home">首页</el-menu-item>
-            <el-menu-item index="2" route="/history">历史记录</el-menu-item>
-            <el-menu-item index="3" route="/star">我的收藏</el-menu-item>
-            <el-menu-item index="4" route="/about">关于</el-menu-item>
           </el-menu>
         </el-col>
         <el-col :span="3">

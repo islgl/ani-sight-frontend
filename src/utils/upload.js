@@ -2,7 +2,6 @@ import {ElMessage} from "element-plus";
 import {instance} from "@/utils/request.js";
 
 export const beforeImageUpload = (file) => {
-    console.log('file: ', file);
     const suffix = file.name.split('.').pop();
     if (suffix !== 'jpg' && suffix !== 'jpeg' && suffix !== 'png') {
         console.error('Invalid image format')

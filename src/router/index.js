@@ -3,9 +3,6 @@ import Home from '@/components/Home.vue'
 import Register from '@/components/user/Register.vue'
 import Forget from '@/components/user/Forget.vue'
 import Profile from "@/components/user/Profile.vue";
-import History from "@/components/data/History.vue";
-import Star from "@/components/data/Star.vue";
-import About from "@/components/About.vue";
 import {createRouter, createWebHistory} from 'vue-router'
 import {instance} from '@/utils/request'
 
@@ -49,27 +46,6 @@ const routes = [
             requireAuth: false
         }
     },
-    {
-        path: '/history',
-        name:'history',
-        component: History,
-        meta: {
-            requireAuth: true
-        }
-    },
-    {
-        path: '/star',
-        name:'star',
-        component: Star,
-        meta: {
-            requireAuth: true
-        }
-    },
-    {
-        path: '/about',
-        name:'about',
-        component: About
-    }
 ]
 
 const router = createRouter({

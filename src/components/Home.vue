@@ -8,9 +8,6 @@
         <el-col :span="19">
           <el-menu mode="horizontal" active-text-color="#20a0ff" default-active="1" router>
             <el-menu-item index="1" route="/home">首页</el-menu-item>
-            <el-menu-item index="2" route="/history">历史记录</el-menu-item>
-            <el-menu-item index="3" route="/star">我的收藏</el-menu-item>
-            <el-menu-item index="4" route="/about">关于</el-menu-item>
           </el-menu>
         </el-col>
         <el-col :span="3">
@@ -22,7 +19,7 @@
               }
             }" router>
               <el-sub-menu>
-                <template #title>{{username}}</template>
+                <template #title>{{ username }}</template>
                 <el-menu-item index="5-1" route="/profile">个人资料</el-menu-item>
                 <el-menu-item index="5-2">退出</el-menu-item>
               </el-sub-menu>
@@ -87,8 +84,10 @@
                 <p id="copy">{{ caption }}</p>
               </el-card>
               <el-container style="justify-content: center">
-                <el-button type="primary" class="copyBtn" id="copyBtn" data-clipboard-target="#copy">{{ copyBtnVal
-                }}</el-button>
+                <el-button type="primary" class="copyBtn" id="copyBtn" data-clipboard-target="#copy">{{
+                  copyBtnVal
+                }}
+                </el-button>
               </el-container>
             </el-container>
           </el-card>
@@ -117,7 +116,6 @@ export default {
       username: '用户',
       imageName: '',
       imageId: 0,
-      base64: '',
       caption: '请上传图像并识别以获取文本描述',
       fontColor: '#DF7878',
       boxColor: '#68C768',
@@ -136,10 +134,6 @@ export default {
       return upload(filename, dir, file).then((res) => {
         this.mainUrl = res.url;
         this.oriUrl = res.url;
-        return img2base64(file);
-      }).then((res) => {
-        // 去除base64头部
-        this.base64 = res.split(',')[1];
         return writeUploadRecord(filename);
       })
         .then((res) => {
@@ -154,9 +148,8 @@ export default {
         });
     },
     inference() {
-      const baseUrl = 'https://fc.lewisliugl.cn/ai';
-      const detectUrl = baseUrl + '/detect';
-      const captionUrl = baseUrl + '/caption';
+      const detectUrl = 'https://fc.lewisliugl.cn/ai/detect';
+      const captionUrl = 'https://image-caption-yapmqhwfps.cn-hongkong.fcapp.run'
 
       if (this.imageId === 0 || this.imageName === '') {
         ElMessage.warning('请先上传图片');
@@ -184,8 +177,15 @@ export default {
         bbox_color: hex2rgb(this.boxColor),
       };
 
-      instance.post(captionUrl, this.base64).then((res) => {
-        this.caption = res.data.caption;
+      instance.get(captionUrl, {
+        params: {
+          image_id: this.imageId,
+          image_name: this.imageName
+        }
+      }).then((res) => {
+        this.caption = res.data;
+        console.log('caption:', this.caption);
+        console.log('response:', res);
         return instance.get(detectUrl, {
           params: detectData
         });
@@ -207,8 +207,6 @@ export default {
         ElMessage.error('识别失败，请稍后重试');
         return Promise.reject(error);
       });
-
-
     },
     logout,
     downloadSegResult() {
@@ -231,8 +229,6 @@ export default {
       link.href = downloadUrl;
       link.click();
     },
-
-
   },
   mounted() {
     const user = JSON.parse(localStorage.getItem('user'));
