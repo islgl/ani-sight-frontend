@@ -1,5 +1,6 @@
 import { instance } from "@/utils/request.js";
 import OSS from 'ali-oss';
+import axios from "axios";
 
 const headers = {
     // 指定Object的存储类型。
@@ -34,15 +35,15 @@ const getClient = async () => {
     const credential = await getStsCredential();
     const client = new OSS({
         // yourregion填写Bucket所在地域。以华东1（杭州）为例，Region填写为oss-cn-hangzhou。
-        region: 'oss-cn-beijing',
-        // endpoint: 'https://oss.lewisliugl.cn',
-        // cname: true,
+        // region: 'oss-cn-beijing',
+        endpoint: 'https://oss.lewisliugl.cn',
+        cname: true,
         // 从环境变量中获取访问凭证。运行本代码示例之前，请确保已设置环境变量OSS_ACCESS_KEY_ID和OSS_ACCESS_KEY_SECRET。
         accessKeyId: credential.accessKeyId,
         accessKeySecret: credential.accessKeySecret,
         stsToken: credential.securityToken,
         // 填写Bucket名称。
-        bucket: 'ani-sight',
+        // bucket: 'ani-sight',
     });
     return client;
 }
@@ -57,10 +58,16 @@ export async function upload(filename, dir, file) {
             dir += '/';
         }
         const filepath = dir + filename
-        const result = await client.put(filepath, file, { headers });
+        let url = client.signatureUrl(filepath, { expires: 300, method: 'PUT' });
+        const parsedUrl = new URL(url);
+        url = parsedUrl.origin + parsedUrl.pathname + '?Signature=' + parsedUrl.searchParams.get('Signature');
+        
+        const result = await axios.put(url, file, { headers });
+
+        // const result = await client.put(filepath, file, { headers });
 
         // 获取带签名的 URL，5min有效
-        const url = client.signatureUrl(filepath, { expires: 300 });
+        // const url = client.signatureUrl(filepath, { expires: 300 });
         return {
             url: url,
             result: result
@@ -78,7 +85,11 @@ export async function getOssUrl(filename, dir) {
             dir += '/';
         }
         const filepath = dir + filename
-        const url = client.signatureUrl(filepath, { expires: 300 });
+        // const url = client.signatureUrl(filepath, { expires: 300 });
+        let url = client.signatureUrl(filepath, { expires: 300, responseContentDisposition: 'attachment' });
+        const parsedUrl = new URL(url);
+        url = parsedUrl.origin + parsedUrl.pathname + '?Signature=' + parsedUrl.searchParams.get('Signature') + '&Expires=' + parsedUrl.searchParams.get('Expires');
+        console.log(url);
         return url;
     }
     catch (e) {
