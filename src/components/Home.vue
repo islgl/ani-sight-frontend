@@ -184,8 +184,6 @@ export default {
         }
       }).then((res) => {
         this.caption = res.data;
-        console.log('caption:', this.caption);
-        console.log('response:', res);
         return instance.get(detectUrl, {
           params: detectData
         });
