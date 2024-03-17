@@ -14,7 +14,7 @@ const routes = [
         name: 'root',
         redirect: '/home',
         meta: {
-            requireAuth: false
+            requireAuth: true
         }
     },
     {

@@ -33,6 +33,9 @@
         <el-button type="text" class="login" @click="toLogin">登录</el-button>
       </el-card>
     </el-main>
+    <el-footer style="position: absolute; bottom: 0;">
+      <Footer/>
+    </el-footer>
   </el-container>
 </template>
 
