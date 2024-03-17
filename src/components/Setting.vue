@@ -1,117 +1,102 @@
 <template>
   <el-container class="root">
     <el-header>
-      <el-row>
-        <el-col :span="2">
-          <el-image style="width: 100px; margin-top: 15px;" src="https://oss.lewisliugl.cn/assets/logo-title.svg"/>
-        </el-col>
-        <el-col :span="19">
-          <el-menu mode="horizontal" active-text-color="#20a0ff" router>
-            <el-menu-item index="1" route="/home">首页</el-menu-item>
-          </el-menu>
-        </el-col>
-        <el-col :span="3">
-          <el-container class="avatar-container">
-            <el-avatar size="medium" :src="avatarUrl"/>
-            <el-menu mode="horizontal" :ellipsis="false" style="border-bottom: none" @select="index => {
-              if (index === '5-2') {
-                this.logout();
-              }
-            }" router>
-              <el-sub-menu>
-                <template #title>{{ usernameInStorage }}</template>
-                <el-menu-item index="5-1" route="/profile">个人资料</el-menu-item>
-                <el-menu-item index="5-2">退出</el-menu-item>
-              </el-sub-menu>
-            </el-menu>
-          </el-container>
-        </el-col>
-      </el-row>
+      <Header style="height: 8vh" :avatar="avatarUrl" :username="usernameInStorage"/>
     </el-header>
-    <el-main>
-      <el-container class="profile-container">
-        <el-col span="4" class="avatar-col">
-          <el-container direction="vertical" class="avatar-container">
-            <el-avatar :src="avatarUrl" style="width: 200px;height: 200px"/>
-            <el-upload :http-request="updateAvatar" :auto-upload="true" :show-file-list="false">
-              <el-button type="primary" style="margin-top: 50px;width: 100px;" class="update-avatar-btn">修改头像
+    <el-container style="height: 92vh">
+      <el-aside style="width: 10vw">
+        <Nav active-index="setting"></Nav>
+      </el-aside>
+      <el-container style="width: 88vw">
+        <el-main>
+          <el-container class="profile-container">
+            <el-col span="4" class="avatar-col">
+              <el-container direction="vertical" class="avatar-container">
+                <el-avatar :src="avatarUrl" style="width: 200px;height: 200px"/>
+                <el-upload :http-request="updateAvatar" :auto-upload="true" :show-file-list="false">
+                  <el-button type="primary" style="margin-top: 50px;width: 100px;" class="update-avatar-btn">修改头像
+                  </el-button>
+                </el-upload>
+              </el-container>
+            </el-col>
+            <el-col span="20">
+              <el-form label-position="top" style="margin-left: 100px">
+                <el-form-item label="UID">
+                  <p style="text-decoration: underline; font-size: 15px;">{{ uid }}</p>
+                </el-form-item>
+                <el-form-item label="用户名">
+                  <el-input v-model="username" size="large" class="profile-input"/>
+                  <el-button type="success" class="update-profile-btn" @click="updateUsername">修改用户名</el-button>
+                </el-form-item>
+                <el-form-item label="邮箱">
+                  <el-input v-model="email" size="large" class="profile-input"/>
+                  <el-button type="success" class="update-profile-btn" @click="showNewEmailDialog">修改邮箱
+                  </el-button>
+                </el-form-item>
+                <el-button type="warning" style="margin-top: 30px" @click="showUpdatePwdDialog">修改密码</el-button>
+                <el-button type="danger" style="margin-top: 30px;margin-left: 50px" @click="showDelDialog">
+                  注销账户
+                </el-button>
+              </el-form>
+            </el-col>
+            <el-dialog v-model="newEmailDialogVisible" title="验证新邮箱" width="300px">
+              <el-form>
+                <el-form-item label="邮箱验证码">
+                  <el-input type="text" placeholder="请输入验证码" v-model="verifyCode"></el-input>
+                </el-form-item>
+                <el-button type="primary" :disabled="count>0" @click="getVerifyCode">
+                  获取验证码{{ count > 0 ? '(' + count + ')' : '' }}
+                </el-button>
+                <el-button type="primary" @click="updateEmail" style="float: right">确认</el-button>
+              </el-form>
+            </el-dialog>
+
+            <el-dialog v-model="delDialogVisible" title="注销账户" width="400px">
+              <el-alert
+                  title="注销账户后，您的所有数据将被清除，且无法恢复"
+                  type="error"
+                  show-icon
+                  :closable="false"
+              />
+              <el-form-item label="验证邮箱" style="margin-top: 10px">
+                <el-input type="text" placeholder="请输入验证码" v-model="verifyCode"></el-input>
+              </el-form-item>
+              <el-button type="primary" :disabled="count>0" @click="getVerifyCode">
+                获取验证码{{ count > 0 ? '(' + count + ')' : '' }}
               </el-button>
-            </el-upload>
+              <el-button type="danger" @click="deleteUser" style="float: right">确认注销</el-button>
+            </el-dialog>
+
+            <el-dialog v-model="updatePwdDialogVisible" title="修改密码" width="400px">
+              <el-form label-position="right"
+                       label-width="100px">
+                <el-form-item label="旧密码">
+                  <el-input type="password" placeholder="请输入旧密码" v-model="oldPwd" show-password></el-input>
+                </el-form-item>
+                <el-form-item label="新密码">
+                  <el-input type="password" placeholder="请输入新密码" v-model="newPwd" show-password></el-input>
+                </el-form-item>
+                <el-form-item label="确认新密码">
+                  <el-input type="password" placeholder="请再次输入新密码" v-model="confirmPwd" show-password></el-input>
+                </el-form-item>
+                <el-button type="primary" @click="updatePwd" style="margin-left: 140px">确认修改</el-button>
+              </el-form>
+            </el-dialog>
           </el-container>
-        </el-col>
-        <el-col span="20">
-          <el-form label-position="top" style="margin-left: 100px">
-            <el-form-item label="UID">
-              <p style="text-decoration: underline; font-size: 15px;">{{ uid }}</p>
-            </el-form-item>
-            <el-form-item label="用户名">
-              <el-input v-model="username" size="large" class="profile-input"/>
-              <el-button type="success" class="update-profile-btn" @click="updateUsername">修改用户名</el-button>
-            </el-form-item>
-            <el-form-item label="邮箱">
-              <el-input v-model="email" size="large" class="profile-input"/>
-              <el-button type="success" class="update-profile-btn" @click="showNewEmailDialog">修改邮箱
-              </el-button>
-            </el-form-item>
-            <el-button type="warning" style="margin-top: 30px" @click="showUpdatePwdDialog">修改密码</el-button>
-            <el-button type="danger" style="margin-top: 30px;margin-left: 50px" @click="showDelDialog">
-              注销账户
-            </el-button>
-          </el-form>
-        </el-col>
-        <el-dialog v-model="newEmailDialogVisible" title="验证新邮箱" width="300px">
-          <el-form>
-            <el-form-item label="邮箱验证码">
-              <el-input type="text" placeholder="请输入验证码" v-model="verifyCode"></el-input>
-            </el-form-item>
-            <el-button type="primary" :disabled="count>0" @click="getVerifyCode">
-              获取验证码{{ count > 0 ? '(' + count + ')' : '' }}
-            </el-button>
-            <el-button type="primary" @click="updateEmail" style="float: right">确认</el-button>
-          </el-form>
-        </el-dialog>
-
-        <el-dialog v-model="delDialogVisible" title="注销账户" width="400px">
-          <el-alert
-              title="注销账户后，您的所有数据将被清除，且无法恢复"
-              type="error"
-              show-icon
-              :closable="false"
-          />
-          <el-form-item label="验证邮箱" style="margin-top: 10px">
-            <el-input type="text" placeholder="请输入验证码" v-model="verifyCode"></el-input>
-          </el-form-item>
-          <el-button type="primary" :disabled="count>0" @click="getVerifyCode">
-            获取验证码{{ count > 0 ? '(' + count + ')' : '' }}
-          </el-button>
-          <el-button type="danger" @click="deleteUser" style="float: right">确认注销</el-button>
-        </el-dialog>
-
-        <el-dialog v-model="updatePwdDialogVisible" title="修改密码" width="400px">
-          <el-form label-position="right"
-                   label-width="100px">
-            <el-form-item label="旧密码">
-              <el-input type="password" placeholder="请输入旧密码" v-model="oldPwd"></el-input>
-            </el-form-item>
-            <el-form-item label="新密码">
-              <el-input type="password" placeholder="请输入新密码" v-model="newPwd"></el-input>
-            </el-form-item>
-            <el-form-item label="确认新密码">
-              <el-input type="password" placeholder="请再次输入新密码" v-model="confirmPwd"></el-input>
-            </el-form-item>
-            <el-button type="primary" @click="updatePwd" style="margin-left: 140px">确认修改</el-button>
-          </el-form>
-        </el-dialog>
+        </el-main>
+        <el-footer>
+          <Footer/>
+        </el-footer>
       </el-container>
-    </el-main>
+    </el-container>
   </el-container>
 </template>
+
 <script>
 import {upload} from "@/utils/oss";
 import {logout} from "@/utils/utils.js";
 import {instance} from "@/utils/request";
 import {ElMessage} from "element-plus";
-
 
 export default {
   data() {
@@ -159,7 +144,6 @@ export default {
         });
       }).then((res) => {
         ElMessage.success('头像更新成功');
-        console.log(res);
       }).catch((err) => {
         console.error(err);
         ElMessage.error(err);
@@ -218,6 +202,7 @@ export default {
         user.email = this.email;
         localStorage.setItem('user', JSON.stringify(user));
         this.newEmailDialogVisible = false;
+        this.count = 0;
       }).catch((err) => {
         console.error(err);
         ElMessage.error(err);
@@ -234,7 +219,6 @@ export default {
         }
       }).then(response => {
         if (response.status === 'success') {
-          console.log(response.message);
           ElMessage.success("验证码已发送至邮箱，5min内有效");
           // 禁用按钮1min
           this.count = 60;
@@ -246,7 +230,7 @@ export default {
           }, 1000)
         }
       }).catch(error => {
-        console.log(error);
+        console.error(error);
         ElMessage.error("验证码发送失败，请稍后重试")
       })
     },
@@ -278,7 +262,6 @@ export default {
         formData.append('newPwd', this.newPwd);
         formData.append('confirmPwd', this.confirmPwd);
         instance.put('/users/update-pwd', formData).then((res) => {
-          console.log(res);
           ElMessage.success('密码修改成功，请重新登录');
           logout();
         }).catch((err) => {
@@ -292,7 +275,6 @@ export default {
 
 const updateProfile = (uid, field, data) => {
   return instance.put('/users' + '/' + uid + '/' + field, data).then((res) => {
-    console.log(res);
     return Promise.resolve();
   }).catch((err) => {
     console.error(err);
@@ -361,10 +343,6 @@ const isConfirmPasswordValid = (password, confirmPassword) => {
 </script>
 
 <style scoped>
-* {
-  overflow: hidden;
-}
-
 .root {
   height: 100vh;
   width: 100vw;

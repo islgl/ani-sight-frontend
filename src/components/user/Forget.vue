@@ -1,19 +1,20 @@
 <template>
   <el-container>
     <el-header>
-      <h1>忘记密码</h1>
+      <el-image src="https://oss.lewisliugl.cn/assets/rainbow-title.svg" style="width: 20vw"/>
     </el-header>
     <el-main>
       <el-card>
+        <h1 class="title">忘记密码</h1>
         <el-form label-width="auto">
           <el-form-item label="邮箱">
             <el-input type="text" placeholder="请输入邮箱" v-model="email"></el-input>
           </el-form-item>
           <el-form-item label="新密码">
-            <el-input type="password" placeholder="请输入新密码" v-model="password"></el-input>
+            <el-input type="password" placeholder="请输入新密码" v-model="password" show-password></el-input>
           </el-form-item>
           <el-form-item label="确认新密码">
-            <el-input type="password" placeholder="请再次输入新密码" v-model="confirmPassword"></el-input>
+            <el-input type="password" placeholder="请再次输入新密码" v-model="confirmPassword" show-password></el-input>
           </el-form-item>
           <el-row>
             <el-col span="10">
@@ -163,8 +164,8 @@ const updatePwd = (email, password, confirmPassword, verifyCode) => {
 }
 
 .el-card {
+  margin-top: 3vh;
   width: 450px;
-  margin: 0 auto;
   padding: 20px;
 }
 
@@ -176,6 +177,13 @@ const updatePwd = (email, password, confirmPassword, verifyCode) => {
   border-radius: 4px;
 }
 
+.title {
+  text-align: center;
+  margin-top: -1vh;
+  margin-bottom: 1vh;
+  font-family: shuhei, sans-serif;
+}
+
 .login {
   float: right;
   margin-right: 40px;
@@ -183,7 +191,7 @@ const updatePwd = (email, password, confirmPassword, verifyCode) => {
 
 .update-btn {
   margin-left: 50px;
-  width: 100px;
+  width: 150px;
 }
 
 .verify-input {
@@ -194,5 +202,4 @@ const updatePwd = (email, password, confirmPassword, verifyCode) => {
   margin-left: 25px;
   width: 120px;
 }
-
 </style>

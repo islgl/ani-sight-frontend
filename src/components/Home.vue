@@ -1,11 +1,11 @@
 <template>
   <el-container class="root">
     <el-header>
-      <Header style="height: 8vh"></Header>
+      <Header style="height: 8vh" :username="username" :avatar="avatarUrl"></Header>
     </el-header>
     <el-container style="height: 92vh">
       <el-aside style="width: 10vw">
-        <Nav></Nav>
+        <Nav active-index="home"></Nav>
       </el-aside>
       <el-container style="width: 88vw">
         <el-main>
@@ -126,9 +126,9 @@
                   <el-icon>
                     <CopyDocument/>
                   </el-icon>
-                  {{ copyBtnVal }}
+                  复制文本描述
                 </el-button>
-                <el-button type="primary" @click="archiveResult">
+                <el-button type="primary" @click="archiveResult" disabled="true">
                   <el-icon>
                     <template v-if="starBtnVal === '归档成功'">
                       <StarFilled/>
@@ -176,8 +176,8 @@ export default {
   data() {
     return {
       username: '用户',
+      avatarUrl: 'https://oss.lewisliugl.cn/avatar/default.svg',
       currentDate: '',
-      copyBtnVal: '复制文本描述',
       starBtnVal: '归档当前结果',
 
       oriUrl: '',
@@ -189,7 +189,6 @@ export default {
       imageName: '',
       fontColor: '#DF7878',
       boxColor: '#68C768',
-
     }
   },
   created() {
@@ -240,12 +239,10 @@ export default {
 
       const loadingInstance = this.$loading({
         lock: true,
-        text: '识别中... 如果是首次识别可能需要较长时间，请耐心等待...',
-        spinner: 'el-icon-loading',
+        text: '识别中，请耐心等待...',
         background: 'rgba(0, 0, 0, 0.7)',
-        fullscreen: false,
-        // target: 'main'
       });
+
 
       const detectData = {
         image_id: this.imageId,
@@ -255,11 +252,13 @@ export default {
       };
 
       instance.get(captionUrl, {
+        // 获取文本描述
         params: {
           image_id: this.imageId,
           image_name: this.imageName
         }
       }).then((res) => {
+        // 获取目标检测结果
         this.caption = res.data;
         return instance.get(detectUrl, {
           params: detectData
@@ -311,6 +310,7 @@ export default {
       } else if (!this.caption || this.segUrl === placeholder || this.detUrl === placeholder) {
         ElMessage.error('识别结果不完整，归档失败')
       }
+      // TODO: write archive record to database
 
     }
   },

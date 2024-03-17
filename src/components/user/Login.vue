@@ -1,48 +1,143 @@
 <template>
-  <el-container>
-    <el-header>
-      <h1>用户登录</h1>
-    </el-header>
-    <el-main>
-      <el-card>
-        <el-form label-width="auto">
-          <el-form-item label="用户名/邮箱">
-            <el-input placeholder="请输入用户名或邮箱" type="text" v-model="usernameOrEmail"></el-input>
-          </el-form-item>
-          <el-form-item label="密码">
-            <el-input type="password" placeholder="请输入密码" v-model="password"></el-input>
-          </el-form-item>
-          <el-button type="primary" @click="checkAndLogin" class="login-btn">登录</el-button>
-          <el-button type="text" class="text-btn" @click="toForget">忘记密码</el-button>
-          <el-button type="text" @click="toRegister" class="text-btn">注册</el-button>
-        </el-form>
-      </el-card>
-    </el-main>
+  <el-container class="root">
+    <el-image src="https://oss.lewisliugl.cn/assets/rainbow-title.svg" class="logo"/>
+    <el-card class="card">
+      <el-row style="height: 38vh;width: 40vw">
+        <el-col :span="10">
+          <div class="banner">
+            <h1 class="welcome">Welcome</h1>
+            <p class="text">基于深度大模型的野生动物识别系统</p>
+          </div>
+        </el-col>
+        <el-col :span="14">
+          <div class="form">
+            <h1 class="title">用户登录</h1>
+            <el-form label-width="auto">
+              <el-form-item label="用户名/邮箱">
+                <el-input placeholder="请输入用户名或邮箱" type="text" v-model="usernameOrEmail"></el-input>
+              </el-form-item>
+              <el-form-item label="密码">
+                <el-input type="password" placeholder="请输入密码" v-model="password" show-password></el-input>
+              </el-form-item>
+              <el-button type="primary" @click="checkAndLogin" class="login-btn">登录</el-button>
+              <el-button type="primary" @click="toRegister" class="register-btn">注册</el-button>
+            </el-form>
+            <el-divider border-style="dashed"/>
+            <el-button type="text" @click="toForget" class="forget-btn">忘记密码？</el-button>
+          </div>
+        </el-col>
+      </el-row>
+    </el-card>
   </el-container>
 </template>
 
 <style scoped>
-.el-container {
-  width: 95vw;
-  height: 50vh;
+.root {
+  width: 100vw;
+  height: 100vh;
+  align-items: center;
+  flex-direction: column;
+}
+
+.logo {
+  width: 20vw;
+  margin-top: 18vh;
+}
+
+.card {
+  margin-top: 5vh;
+  width: 40vw;
+  height: 38vh;
+  display: flex;
   justify-content: center;
   align-items: center;
 }
 
-.el-card {
-  width: 400px;
-  margin: 0 auto;
-  padding: 20px;
+.card .banner {
+  width: 100%;
+  height: 100%;
+  display: flex;
   justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  background-size: cover; /* 自适应缩放并填充整个区域 */
+  background-position: center; /* 图片在背景中的位置 */
+  background-repeat: no-repeat; /* 禁止重复 */
+  background-image: url("https://cdn.jsdelivr.net/gh/islgl/img-hosting/imgs/202403171926495.jpg");
 }
 
-.text-btn {
-  float: right;
+.card .banner .welcome {
+  font-size: 3rem;
+  color: #fff;
+  text-align: center;
+  text-shadow: 0 0 10px #000;
+  font-weight: bold;
+  letter-spacing: 5px;
+  text-transform: uppercase;
+  animation: blink 1s infinite;
 }
 
-.login-btn {
-  margin-left: 40px;
-  width: 100px;
+.card .banner .text {
+  color: #fff;
+  text-align: center;
+  text-shadow: 0 0 10px #000;
+  letter-spacing: 3px;
+}
+
+.card .form {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+
+.card .form .title {
+  margin-top: 2vh;
+  font-family: shuhei,sans-serif;
+}
+
+.el-form {
+  margin-top: 5vh;
+  width: 80%;
+}
+
+.el-button{
+  border: none;
+  border-radius: 8px;
+  width: 8vw;
+  height: 4vh;
+  transition: .3s;
+}
+
+.login-btn{
+  font-family: monospace;
+  background-color: #3b82f6;
+  color: #fff;
+  margin-right: 2vw;
+}
+
+.login-btn:hover {
+  box-shadow: 0 0 0 5px #3b83f65f;
+}
+
+
+.register-btn {
+  font-family: monospace;
+  background-color: #f3f7fe;
+  color: #3b82f6;
+
+}
+
+.register-btn:hover {
+  background-color: #3b82f6;
+  box-shadow: 0 0 0 5px #3b83f65f;
+  color: #fff;
+}
+
+.forget-btn{
+  color: #72767b;
+  font-size: 16px;
 }
 
 </style>
@@ -61,6 +156,9 @@ export default {
     }
   },
   methods: {
+    router() {
+      return router
+    },
     checkAndLogin() {
       // true if email, false if username
       const userType = this.usernameOrEmail.includes('@');

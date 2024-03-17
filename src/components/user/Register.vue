@@ -1,10 +1,11 @@
 <template>
   <el-container>
     <el-header>
-      <h1>用户注册</h1>
+      <el-image src="https://oss.lewisliugl.cn/assets/rainbow-title.svg" style="width: 20vw"/>
     </el-header>
     <el-main>
-      <el-card>
+      <el-card class="card">
+        <h1 class="title">用户注册</h1>
         <el-form label-width="auto">
           <el-form-item label="用户名">
             <el-input placeholder="请输入用户名" type="text" v-model="username"></el-input>
@@ -13,10 +14,10 @@
             <el-input type="text" placeholder="请输入邮箱" v-model="email"></el-input>
           </el-form-item>
           <el-form-item label="密码">
-            <el-input type="password" placeholder="请输入密码" v-model="password"></el-input>
+            <el-input type="password" placeholder="请输入密码" v-model="password" show-password></el-input>
           </el-form-item>
           <el-form-item label="确认密码">
-            <el-input type="password" placeholder="请再次输入密码" v-model="confirmPassword"></el-input>
+            <el-input type="password" placeholder="请再次输入密码" v-model="confirmPassword" show-password></el-input>
           </el-form-item>
           <el-row>
             <el-col span="10">
@@ -48,7 +49,7 @@
 
 .el-card {
   width: 450px;
-  margin: 0 auto;
+  margin-top: 3vh;
   padding: 20px;
 }
 
@@ -64,9 +65,16 @@
   float: right;
 }
 
+.title {
+  text-align: center;
+  margin-top: -1vh;
+  margin-bottom: 1vh;
+  font-family: shuhei, sans-serif;
+}
+
 .register-btn {
   margin-left: 50px;
-  width: 100px;
+  width: 150px;
 }
 
 .verify-input {
@@ -77,8 +85,6 @@
   margin-left: 25px;
   width: 120px;
 }
-
-
 </style>
 
 <script>

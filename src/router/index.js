@@ -2,9 +2,11 @@ import Login from '@/components/user/Login.vue'
 import Home from '@/components/Home.vue'
 import Register from '@/components/user/Register.vue'
 import Forget from '@/components/user/Forget.vue'
-import Profile from "@/components/user/Profile.vue";
 import {createRouter, createWebHistory} from 'vue-router'
 import {instance} from '@/utils/request'
+import Setting from "@/components/Setting.vue";
+import NotFound from "@/components/NotFound.vue";
+
 
 const routes = [
     {
@@ -12,7 +14,7 @@ const routes = [
         name: 'root',
         redirect: '/home',
         meta: {
-            requireAuth: true
+            requireAuth: false
         }
     },
     {
@@ -39,13 +41,26 @@ const routes = [
         component: Forget
     },
     {
-        path: '/profile',
-        name:'profile',
-        component: Profile,
+        path: '/setting',
+        name: 'setting',
+        component: Setting,
+        meta: {
+            requireAuth: true
+        }
+    },
+    {
+        path: '/404',
+        name: 'notfound',
+        component: NotFound,
         meta: {
             requireAuth: false
         }
     },
+    {
+        path: '/:catchAll(.*)', // 使用通配符路由捕获所有路径
+        redirect: '/404' // 重定向到 404 页面
+    },
+
 ]
 
 const router = createRouter({
@@ -81,10 +96,10 @@ router.beforeEach((to, from, next) => {
     }
 
     // 主页初始化
-    if(to.name === 'root'||to.name === 'home') {
+    if (to.name === 'root' || to.name === 'home') {
         const user = JSON.parse(localStorage.getItem('user'))
         if (user !== null) {
-            const uid=user.uid
+            const uid = user.uid
         }
     }
 })
