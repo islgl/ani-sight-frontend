@@ -1,128 +1,205 @@
 <template>
   <el-container class="root">
     <el-header>
-      <el-row>
-        <el-col :span="2">
-          <el-image style="width: 100px; margin-top: 15px;" src="https://oss.lewisliugl.cn/assets/logo-title.svg" />
-        </el-col>
-        <el-col :span="19">
-          <el-menu mode="horizontal" active-text-color="#20a0ff" default-active="1" router>
-            <el-menu-item index="1" route="/home">首页</el-menu-item>
-          </el-menu>
-        </el-col>
-        <el-col :span="3">
-          <el-container class="avatar-container">
-            <el-avatar size="medium" :src="avatarUrl" />
-            <el-menu mode="horizontal" :ellipsis="false" style="border-bottom: none" @select="index => {
-              if (index === '5-2') {
-                this.logout();
-              }
-            }" router>
-              <el-sub-menu>
-                <template #title>{{ username }}</template>
-                <el-menu-item index="5-1" route="/profile">个人资料</el-menu-item>
-                <el-menu-item index="5-2">退出</el-menu-item>
-              </el-sub-menu>
-            </el-menu>
-          </el-container>
-        </el-col>
-      </el-row>
+      <Header style="height: 8vh"></Header>
     </el-header>
-    <el-main>
-      <el-row>
-        <el-col :span="5" style="width: 100vw">
-          <el-card style="width: 99%;height: 100%">
-            <el-container direction="vertical">
-              <el-container class="thumb-container" direction="vertical">
-                <el-image :src="segUrl" fit="contain" />
-                <p>图像分割结果</p>
-              </el-container>
-              <el-container class="thumb-container" direction="vertical">
-                <el-image :src="oriUrl" fit="contain" />
-                <p>原始图像</p>
-              </el-container>
-              <el-container style="justify-content: center;margin-bottom: 20px">
-                <el-button type="primary" style="width:200px" @click="downloadSegResult">下载分割结果</el-button>
-              </el-container>
-              <el-container style="justify-content: center">
-                <el-button type="primary" style="width:200px" @click="downloadDetResult">下载识别结果</el-button>
-              </el-container>
-            </el-container>
+    <el-container style="height: 92vh">
+      <el-aside style="width: 10vw">
+        <Nav></Nav>
+      </el-aside>
+      <el-container style="width: 88vw">
+        <el-main>
+          <el-card shadow="always" class="welcome">
+            <div class="greeting-container">
+              <div class="title">
+                <i class="iconfont icon-bell"/>
+                <h1 class="greeting">
+                  Hi，{{ username }}！欢迎使用AniSight。
+                </h1>
+              </div>
+              <div class="title">
+                <i class="iconfont icon-rili"/>
+                <h1 class="greeting">
+                  {{ currentDate }}
+                </h1>
+              </div>
+            </div>
+            <el-text type="info" size="large" style="margin-left: 20px">
+              AniSight 是一款基于深度大模型的野生动物识别系统，支持目标检测、图像分割、文本描述等功能。
+            </el-text>
+
           </el-card>
-        </el-col>
-        <el-col :span="14">
-          <el-container class="image" direction="vertical" id="main">
-            <el-image style="width: 765px; height: 450px" :src="mainUrl" fit="contain" />
-            <el-container>
-              <el-upload :http-request="uploadImage" :multiple="false" :auto-upload="true"
-                :before-upload="beforeImageUpload" :on-exceed="onExceed">
-                <el-button type="primary" class="upload-det-btn">上传图片</el-button>
-              </el-upload>
-              <el-container style="margin-top: 30px;margin-left: 50px">
-                <el-form :inline="true">
-                  <el-form-item label="字体颜色">
-                    <el-color-picker v-model="fontColor" />
-                  </el-form-item>
-                  <el-form-item label="标注框颜色">
-                    <el-color-picker v-model="boxColor" />
-                  </el-form-item>
-                  <el-form-item>
-                    <el-button type="primary" style="width: 150px" @click="inference">AI 识别</el-button>
-                  </el-form-item>
-                </el-form>
-              </el-container>
-            </el-container>
+          <el-container class="overview">
+            <el-card shadow="always" class="content history">
+              <div class="title">
+                <i class="icon iconfont icon-lishijilu"/>
+                <h2>历史记录总数</h2>
+              </div>
+            </el-card>
+            <el-card shadow="always" class="content star">
+              <div class="title">
+                <i class="icon iconfont icon-shoucang"/>
+                <h2>我的归档总数</h2>
+              </div>
+            </el-card>
+            <el-card shadow="always" class="content most">
+              <div class="title">
+                <i class="icon iconfont icon-xiongmaobaohu"/>
+                <h2>识别最多物种</h2>
+              </div>
+            </el-card>
           </el-container>
-        </el-col>
-        <el-col :span="5">
-          <el-card style="width: 90%;height: 100%">
-            <el-container direction="vertical" style="justify-content: center">
-              <el-container style="justify-content: center">
-                <h3 style="margin-bottom: 20px">图像文本描述</h3>
+          <el-container class="function">
+            <el-card shadow="always" class="content inference">
+              <div class="image-container">
+                <template v-if="!oriUrl">
+                  <el-empty description="请先上传图片" class="image"/>
+                </template>
+                <template v-else>
+                  <el-image :src="oriUrl" fit="scale-down"
+                            class="image">
+                  </el-image>
+                </template>
+              </div>
+              <el-divider border-style="dashed"/>
+              <el-container class="buttons">
+                <el-upload :http-request="uploadImage" :multiple="false" :auto-upload="true"
+                           :before-upload="beforeImageUpload" :on-exceed="onExceed" :show-file-list="false"
+                           class="button">
+                  <el-button type="primary" class="button">
+                    <el-icon>
+                      <UploadFilled/>
+                    </el-icon>
+                    上传图片
+                  </el-button>
+                </el-upload>
+                <el-button type="primary" class="button" @click="inference">
+                  <el-icon>
+                    <Aim/>
+                  </el-icon>
+                  AI 识别
+                </el-button>
+                <el-text class="text">标注框颜色</el-text>
+                <el-color-picker v-model="boxColor"/>
+                <el-text class="text">字体颜色</el-text>
+                <el-color-picker v-model="fontColor"/>
               </el-container>
-              <el-card class="caption" style="margin-bottom: 20px;height: 50vh">
-                <p id="copy">{{ caption }}</p>
-              </el-card>
-              <el-container style="justify-content: center">
-                <el-button type="primary" class="copyBtn" id="copyBtn" data-clipboard-target="#copy">{{
-                  copyBtnVal
-                }}
+            </el-card>
+            <el-card shadow="always" class="content result">
+              <el-container class="image-results">
+                <template v-if="!detUrl">
+                  <el-empty description="上传图片并识别以获取结果" class="image"/>
+                </template>
+                <template v-else>
+                  <el-image :src="detUrl" class="image"
+                            fit="scale-down"/>
+                </template>
+                <el-divider direction="vertical" style="height: 100%"/>
+                <template v-if="!segUrl">
+                  <el-empty description="上传图片并识别以获取结果" class="image"/>
+                </template>
+                <template v-else>
+                  <el-image :src="segUrl" class="image"
+                            fit="scale-down"/>
+                </template>
+              </el-container>
+              <el-divider border-style="dotted"/>
+              <el-input id="copy" type="textarea" placeholder="请上传图片并识别以获取文本描述" :rows="3"
+                        :readonly="true"
+                        resize='none'
+                        v-model="caption"/>
+              <el-divider border-style="dotted"/>
+              <el-container class="buttons">
+                <el-button type="primary" @click="downloadDetResult">
+                  <el-icon>
+                    <Download/>
+                  </el-icon>
+                  下载识别结果
+                </el-button>
+                <el-button type="primary" @click="downloadSegResult">
+                  <el-icon>
+                    <Download/>
+                  </el-icon>
+                  下载分割结果
+                </el-button>
+                <el-button type="primary" id="copyBtn" data-clipboard-target="#copy">
+                  <el-icon>
+                    <CopyDocument/>
+                  </el-icon>
+                  {{ copyBtnVal }}
+                </el-button>
+                <el-button type="primary" @click="archiveResult">
+                  <el-icon>
+                    <template v-if="starBtnVal === '归档成功'">
+                      <StarFilled/>
+                    </template>
+                    <template v-else>
+                      <Star/>
+                    </template>
+                  </el-icon>
+                  {{ starBtnVal }}
                 </el-button>
               </el-container>
-            </el-container>
-          </el-card>
-        </el-col>
-      </el-row>
-    </el-main>
+            </el-card>
+          </el-container>
+        </el-main>
+        <el-footer>
+          <Footer/>
+        </el-footer>
+      </el-container>
+    </el-container>
   </el-container>
 </template>
 
 <script>
-import { writeUploadRecord, renameImage, beforeImageUpload, onExceed } from "@/utils/upload.js";
-import router from "@/router";
-import { ElMessage } from "element-plus";
-import { upload, getOssUrl } from "@/utils/oss.js";
-import { instance } from "@/utils/request";
-import Clipboard from 'clipboard';
-import { logout } from "@/utils/utils.js";
+import {
+  Aim,
+  BellFilled,
+  Comment,
+  CopyDocument,
+  Download,
+  Edit,
+  Star,
+  StarFilled,
+  UploadFilled
+} from "@element-plus/icons";
+import {ElMessage} from "element-plus";
+import {logout} from "@/utils/utils.js";
+import {instance} from "@/utils/request.js";
+import {getOssUrl, upload} from "@/utils/oss.js";
+import {beforeImageUpload, onExceed, renameImage, writeUploadRecord} from "@/utils/upload.js";
+import Clipboard from "clipboard";
 
 export default {
+  name: 'Home',
+  components: {StarFilled, Star, BellFilled, CopyDocument, Comment, Download, Aim, UploadFilled, Edit},
   data() {
     return {
-      mainUrl: 'https://oss.lewisliugl.cn/assets/banner.svg',
-      segUrl: 'https://oss.lewisliugl.cn/assets/placeholder.svg',
-      oriUrl: 'https://oss.lewisliugl.cn/assets/placeholder.svg',
-      avatarUrl: 'https://oss.lewisliugl.cn/avatar/default.svg',
       username: '用户',
-      imageName: '',
+      currentDate: '',
+      copyBtnVal: '复制文本描述',
+      starBtnVal: '归档当前结果',
+
+      oriUrl: '',
+      detUrl: '',
+      segUrl: '',
+      caption: '',
+
       imageId: 0,
-      caption: '请上传图像并识别以获取文本描述',
+      imageName: '',
       fontColor: '#DF7878',
       boxColor: '#68C768',
-      copyBtnVal: '复制到剪贴板',
+
     }
   },
+  created() {
+    this.currentDate = this.getCurrentDate();
+  },
   methods: {
+    getCurrentDate() {
+      const now = new Date();
+      return now.toLocaleDateString();
+    },
     onExceed,
     beforeImageUpload,
     uploadImage(item) {
@@ -132,20 +209,20 @@ export default {
       const filename = renameImage() + '.' + suffix;
       const dir = 'images/';
       return upload(filename, dir, file).then((res) => {
-        this.mainUrl = res.url;
+        this.oriUrl = res.url;
         this.oriUrl = res.url;
         return writeUploadRecord(filename);
       })
-        .then((res) => {
-          this.imageName = res.filename;
-          this.imageId = res.id;
-          ElMessage.success('上传成功');
-          return Promise.resolve('Successfully uploaded image');
-        }).catch((error) => {
-          console.error(error);
-          ElMessage.error('上传失败，请稍后重试');
-          return Promise.reject(error);
-        });
+          .then((res) => {
+            this.imageName = res.filename;
+            this.imageId = res.id;
+            ElMessage.success('上传成功');
+            return Promise.resolve('Successfully uploaded image');
+          }).catch((error) => {
+            console.error(error);
+            ElMessage.error('上传失败，请稍后重试');
+            return Promise.reject(error);
+          });
     },
     inference() {
       const detectUrl = 'https://fc.lewisliugl.cn/ai/detect';
@@ -197,7 +274,7 @@ export default {
         ElMessage.success('识别成功');
         return getOssUrl(this.imageName, 'labels');
       }).then((res) => {
-        this.mainUrl = res;
+        this.detUrl = res;
         return Promise.resolve('Successfully detected');
       }).catch((error) => {
         loadingInstance.close();
@@ -208,7 +285,7 @@ export default {
     },
     logout,
     downloadSegResult() {
-      if (this.segUrl == 'https://oss.lewisliugl.cn/assets/placeholder.svg') {
+      if (this.segUrl === 'https://oss.lewisliugl.cn/assets/placeholder.svg') {
         ElMessage.warning('请先上传图片并识别');
         return;
       }
@@ -218,15 +295,24 @@ export default {
       link.click();
     },
     downloadDetResult() {
-      if (this.mainUrl == 'https://oss.lewisliugl.cn/assets/banner.svg') {
+      if (this.oriUrl === 'https://oss.lewisliugl.cn/assets/placeholder.svg') {
         ElMessage.warning('请先上传图片并识别');
         return;
       }
-      const downloadUrl = this.mainUrl;
+      const downloadUrl = this.oriUrl;
       const link = document.createElement('a');
       link.href = downloadUrl;
       link.click();
     },
+    archiveResult() {
+      const placeholder = 'https://oss.lewisliugl.cn/assets/placeholder.svg'
+      if (!this.caption && this.segUrl === placeholder && this.detUrl === placeholder) {
+        ElMessage.info('请上传图片并识别以获取结果')
+      } else if (!this.caption || this.segUrl === placeholder || this.detUrl === placeholder) {
+        ElMessage.error('识别结果不完整，归档失败')
+      }
+
+    }
   },
   mounted() {
     const user = JSON.parse(localStorage.getItem('user'));
@@ -236,28 +322,10 @@ export default {
     }
   }
 }
-
 const hex2rgb = hex => {
   const bgr = [parseInt(hex.slice(1, 3), 16), parseInt(hex.slice(3, 5), 16), parseInt(hex.slice(5, 7), 16)];
   const rgb = [bgr[2], bgr[1], bgr[0]];
   return `(${rgb.join(',')})`;
-}
-
-const img2base64 = file => {
-  return new Promise((resolve, reject) => {
-    let reader = new FileReader()
-    let fileResult = ''
-    reader.readAsDataURL(file)
-    reader.onload = function () {
-      fileResult = reader.result
-    }
-    reader.onerror = function (error) {
-      reject(error)
-    }
-    reader.onloadend = function () {
-      resolve(fileResult)
-    }
-  })
 }
 
 // TODO: write inference record to database
@@ -265,63 +333,181 @@ const writeInferenceRecord = () => {
 
 }
 
-var clipboard = new Clipboard('.copyBtn');
+const clipboard = new Clipboard('#copyBtn');
 clipboard.on('success', function (e) {
-  //注销对象
   e.clearSelection();
   ElMessage.success('复制成功');
   this.copyBtnVal = "复制成功";
 });
+clipboard.on('error', function (e) {
+  e.clearSelection();
+  ElMessage.info('请上传图片并识别以获取文本描述');
+});
 </script>
 
 <style scoped>
-* {
-  overflow: hidden;
-}
-
 .root {
   height: 100vh;
   width: 100vw;
 }
 
-.el-main {
+.welcome {
+  width: 95%;
+  height: 15%;
+  background-color: #F3F6FD;
+}
+
+.welcome .greeting-container {
+  display: flex; /* 使用 Flexbox 布局 */
+  justify-content: space-between; /* 在容器中平均分布子元素，使它们横向排列 */
+}
+
+.welcome .greeting-container .title {
+  display: flex;
+  align-items: center;
+}
+
+.welcome .greeting-container .greeting {
+  font-size: 1.5rem;
+  margin-bottom: 1%;
+}
+
+.welcome .greeting-container i {
+  font-size: 1.8rem;
+  margin-right: 20px;
+}
+
+.overview {
+  width: 95%;
+  height: 15%;
+  margin-top: 1%;
+}
+
+.overview .title {
+  display: flex;
+  align-items: center;
+}
+
+.overview .icon {
+  font-size: 3rem;
+  margin-right: 15px;
+}
+
+.overview h2 {
+  font-size: 1.5rem;
+  font-family: fangyuan, sans-serif;
+}
+
+.overview .content {
+  width: 33%;
+  height: 100%;
+  margin-right: 1%;
+}
+
+.overview .el-card {
+  display: flex;
+  align-items: center;
+}
+
+.overview .most {
+  margin-right: 0;
+  background-color: #DBF6FD;
+}
+
+.overview .history {
+  background-color: #FEE4CB;
+}
+
+.overview .star {
+  background-color: #E9E7FD;
+}
+
+.function {
+  width: 95%;
+  height: 65%;
+  margin-top: 1%;
+}
+
+.function .content {
+  width: 49%;
+  margin-right: 2%;
+}
+
+.function .inference {
+  display: flex;
+  flex-direction: column;
+}
+
+.function .inference .image-container {
+  height: 35vh;
+  width: auto;
   display: flex;
   justify-content: center;
   align-items: center;
-
+  margin-bottom: 2%;
 }
 
-.image {
+.function .inference .image-container .image {
+  height: 100%;
+  width: 100%;
+}
+
+.function .result {
+  margin-right: 0;
+}
+
+
+.function .inference .buttons {
+  display: flex;
+  justify-content: center;
+}
+
+.function .inference .buttons .button {
+  width: 8vw;
+  margin-right: 3%;
+}
+
+.function .inference .buttons .text {
+  margin-left: 3%;
+  margin-right: 1%;
+  display: flex;
+  align-items: center;
+}
+
+.function .result .image-results {
+  display: flex;
+  justify-content: space-between;
+  height: 22vh;
+}
+
+.function .result .image-results .image {
+  width: 49%;
+  height: auto;
+}
+
+.function .result .buttons {
+  display: flex;
+  justify-content: center;
+//margin-top: 4%;
+}
+
+.function .result .buttons .el-button {
+  width: 8vw;
+  margin-right: 2%;
+}
+
+.el-icon {
+  margin-right: 3px;
+}
+
+.image-slot {
   display: flex;
   justify-content: center;
   align-items: center;
-}
-
-.upload-det-btn {
-  margin-top: 30px;
-  margin-left: 30px;
-  margin-right: 30px;
-  width: 150px;
-}
-
-.thumb-container {
-  margin-bottom: 30px;
-  align-items: center;
-  justify-content: center;
-}
-
-.caption {
-  height: 45vh;
-}
-
-.avatar-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-top: 10px;
-}
-
-.copyBtn {
-  width: 200px;
+  width: 100%;
+  height: 100%;
+  background: var(--el-fill-color-light);
+  color: var(--el-text-color-secondary);
+  font-size: 14px;
 }
 </style>
