@@ -4,6 +4,19 @@
       <el-image :src="logo" class="logo"/>
     </div>
     <div class="right">
+      <el-popover
+        placement="bottom"
+        width="200"
+        trigger="click"
+        :title="version"
+        :content="versionInfo"
+      >
+        <template #reference>
+          <div class="badges">
+            <button class="blue">v1.0.2</button>
+          </div>
+        </template>
+      </el-popover>
       <el-text class="username">{{ username }}</el-text>
       <el-avatar :src="avatar" class="avatar"/>
     </div>
@@ -16,6 +29,8 @@ export default {
   data() {
     return {
       logo: "https://oss.lewisliugl.cn/assets/logo-title.svg",
+      version:'v 1.0.2 更新内容',
+      versionInfo:'👋新增版本徽章🎉'
     }
   },
   props:{
@@ -46,6 +61,7 @@ export default {
 .right {
   display: flex;
   align-items: center;
+  margin-right: 3vw;
 }
 
 .logo {
@@ -56,4 +72,31 @@ export default {
 .username {
   margin-right: 20px;
 }
+
+.badges {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem; /* 16px */
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-right: 1vw;
+}
+
+.badges > button {
+  font-size: 0.875rem; /* 14px */
+  line-height: 1.25rem; /* 20px */
+  padding: 2px .5rem; /* 8px*/
+  cursor: pointer;
+  border: none;
+  border-radius: 0.375rem; /* 6px */
+  outline: none;
+}
+
+.badges .blue {
+  background-color: rgba(59, 130, 246, 0.10);
+  color: rgb(59 130 246);
+  border: 1px rgb(59 130 246) solid;
+}
+
 </style>

@@ -40,6 +40,11 @@
   height: 100vh;
   align-items: center;
   flex-direction: column;
+  /* Add your background pattern here */
+  background-color: #ffffff;
+  background-image: radial-gradient(rgba(12, 12, 12, 0.171) 2px, transparent 0);
+  background-size: 30px 30px;
+  background-position: -5px -5px;
 }
 
 .logo {
@@ -106,6 +111,7 @@
 }
 
 .el-button{
+  margin-top: 2vh;
   border: none;
   border-radius: 8px;
   width: 8vw;
@@ -140,7 +146,8 @@
 
 .forget-btn{
   color: #72767b;
-  font-size: 16px;
+  font-size: 14px;
+  margin-top: -0.5vh;
 }
 
 </style>
