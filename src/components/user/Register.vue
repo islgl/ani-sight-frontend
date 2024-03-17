@@ -1,7 +1,7 @@
 <template>
   <el-container>
     <el-header>
-      <el-image src="https://oss.lewisliugl.cn/assets/rainbow-title.svg" style="width: 20vw"/>
+      <el-image src="https://oss.lewisliugl.cn/assets/rainbow-title.svg" style="width: 25vw"/>
     </el-header>
     <el-main>
       <el-card class="card">

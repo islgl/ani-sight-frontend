@@ -8,12 +8,12 @@
         placement="bottom"
         width="200"
         trigger="click"
-        :title="version"
+        :title="versionTitle"
         :content="versionInfo"
       >
         <template #reference>
           <div class="badges">
-            <button class="blue">v1.0.2</button>
+            <button class="blue">{{ version }}</button>
           </div>
         </template>
       </el-popover>
@@ -29,8 +29,9 @@ export default {
   data() {
     return {
       logo: "https://oss.lewisliugl.cn/assets/logo-title.svg",
-      version:'v 1.0.2 更新内容',
-      versionInfo:'👋新增版本徽章🎉'
+      version:'v1.1.3',
+      versionTitle:'v 1.1.3 更新内容',
+      versionInfo:'👋 优化登录页 UI 样式 🎉'
     }
   },
   props:{

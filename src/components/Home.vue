@@ -56,9 +56,8 @@
                   <el-empty description="请先上传图片" class="image"/>
                 </template>
                 <template v-else>
-                  <el-image :src="oriUrl" fit="scale-down"
-                            class="image">
-                  </el-image>
+                  <el-image :src="oriUrl" fit="scale-down" :previewSrcList="[oriUrl]"
+                            class="image" :hide-on-click-modal="true"/>
                 </template>
               </div>
               <el-divider border-style="dashed"/>
@@ -92,7 +91,7 @@
                 </template>
                 <template v-else>
                   <el-image :src="detUrl" class="image"
-                            fit="scale-down"/>
+                            fit="scale-down" :preview-src-list="[detUrl]" :hide-on-click-modal="true"/>
                 </template>
                 <el-divider direction="vertical" style="height: 100%"/>
                 <template v-if="!segUrl">
@@ -100,7 +99,7 @@
                 </template>
                 <template v-else>
                   <el-image :src="segUrl" class="image"
-                            fit="scale-down"/>
+                            fit="scale-down" :preview-src-list="[segUrl]" :hide-on-click-modal="true"/>
                 </template>
               </el-container>
               <el-divider border-style="dotted"/>
@@ -163,7 +162,7 @@ import {
   StarFilled,
   UploadFilled
 } from "@element-plus/icons";
-import {ElMessage} from "element-plus";
+import {ElMessage, ElMessageBox} from "element-plus";
 import {logout} from "@/utils/utils.js";
 import {instance} from "@/utils/request.js";
 import {getOssUrl, upload} from "@/utils/oss.js";
@@ -354,7 +353,7 @@ clipboard.on('error', function (e) {
 .welcome {
   width: 95%;
   height: 15%;
-  background-color: #F3F6FD;
+  background-color: rgba(243, 246, 253, 0.7); /* 透明度设置为0.7 */
 }
 
 .welcome .greeting-container {
@@ -409,18 +408,20 @@ clipboard.on('error', function (e) {
   align-items: center;
 }
 
+/* 修改后的样式 */
 .overview .most {
   margin-right: 0;
-  background-color: #DBF6FD;
+  background-color: rgba(219, 246, 253, 0.7); /* #DBF6FD，透明度为0.7 */
 }
 
 .overview .history {
-  background-color: #FEE4CB;
+  background-color: rgba(254, 228, 203, 0.7); /* #FEE4CB，透明度为0.7 */
 }
 
 .overview .star {
-  background-color: #E9E7FD;
+  background-color: rgba(233, 231, 253, 0.7); /* #E9E7FD，透明度为0.7 */
 }
+
 
 .function {
   width: 95%;

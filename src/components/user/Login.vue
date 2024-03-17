@@ -2,7 +2,7 @@
   <el-container class="root">
     <el-image src="https://oss.lewisliugl.cn/assets/rainbow-title.svg" class="logo"/>
     <el-card class="card">
-      <el-row style="height: 38vh;width: 40vw">
+      <el-row style="height: 45vh;width: 50vw">
         <el-col :span="10">
           <div class="banner">
             <h1 class="welcome">Welcome</h1>
@@ -40,22 +40,17 @@
   height: 100vh;
   align-items: center;
   flex-direction: column;
-  /* Add your background pattern here */
-  background-color: #ffffff;
-  background-image: radial-gradient(rgba(12, 12, 12, 0.171) 2px, transparent 0);
-  background-size: 30px 30px;
-  background-position: -5px -5px;
 }
 
 .logo {
-  width: 20vw;
-  margin-top: 18vh;
+  width: 25vw;
+  margin-top: 15vh;
 }
 
 .card {
   margin-top: 5vh;
-  width: 40vw;
-  height: 38vh;
+  width: 50vw;
+  height: 45vh;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -71,7 +66,7 @@
   background-size: cover; /* 自适应缩放并填充整个区域 */
   background-position: center; /* 图片在背景中的位置 */
   background-repeat: no-repeat; /* 禁止重复 */
-  background-image: url("https://cdn.jsdelivr.net/gh/islgl/img-hosting/imgs/202403171926495.jpg");
+  background-image: url("https://oss.lewisliugl.cn/assets/banner.jpg");
 }
 
 .card .banner .welcome {
@@ -114,7 +109,7 @@
   margin-top: 2vh;
   border: none;
   border-radius: 8px;
-  width: 8vw;
+  width: 10vw;
   height: 4vh;
   transition: .3s;
 }
@@ -147,7 +142,7 @@
 .forget-btn{
   color: #72767b;
   font-size: 14px;
-  margin-top: -0.5vh;
+  margin-top: 1vh;
 }
 
 </style>
