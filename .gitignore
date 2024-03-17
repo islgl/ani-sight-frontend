@@ -1,4 +1,7 @@
 /docs/.vitepress/cache
+/src/assets/fonts
+/src/assets/icons
+ani-sight-*.jar
 
 .vscode
 .idea

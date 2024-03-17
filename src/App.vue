@@ -6,5 +6,10 @@
   <router-view/>
 </template>
 
-<style scoped>
+<style>
+body{
+  height: 100%;
+  width: 100%;
+  font-family: coda,sans-serif;
+}
 </style>

@@ -1,0 +1,27 @@
+@font-face {
+    font-family:'coda';
+    src:url('fonts/Coda/Coda-Regular.ttf');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family:'dakai';
+    src:url('fonts/DongFangDaKai/AlimamaDongFangDaKai-Regular.ttf');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family:'shuhei';
+    src:url('fonts/ShuHei/AlimamaShuHeiTi-Bold.ttf');
+    font-weight: 200;
+    font-style: normal;
+}
+
+@font-face {
+    font-family:'fangyuan';
+    src:url('fonts/FangYuan/AlimamaFangYuanTiVF-Thin.ttf');
+    font-weight: normal;
+    font-style: normal;
+}
