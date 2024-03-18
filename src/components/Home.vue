@@ -297,7 +297,7 @@ export default {
         ElMessage.warning('请先上传图片并识别');
         return;
       }
-      const downloadUrl = this.oriUrl;
+      const downloadUrl = this.detUrl;
       const link = document.createElement('a');
       link.href = downloadUrl;
       link.click();
