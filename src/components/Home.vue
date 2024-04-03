@@ -503,7 +503,6 @@ const writeInferenceRecord = (uid, image, caption) => {
 .function .result .buttons {
   display: flex;
   justify-content: center;
-  //margin-top: 4%;
 }
 
 .function .result .buttons .el-button {
