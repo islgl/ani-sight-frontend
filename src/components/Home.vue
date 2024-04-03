@@ -12,13 +12,13 @@
           <el-card shadow="always" class="welcome">
             <div class="greeting-container">
               <div class="title">
-                <i class="iconfont icon-bell"/>
+                <i class="iconfont icon-bell" />
                 <h1 class="greeting">
                   Hi，{{ username }}！欢迎使用AniSight。
                 </h1>
               </div>
               <div class="title">
-                <i class="iconfont icon-rili"/>
+                <i class="iconfont icon-rili" />
                 <h1 class="greeting">
                   {{ currentDate }}
                 </h1>
@@ -32,19 +32,19 @@
           <el-container class="overview">
             <el-card shadow="always" class="content history">
               <div class="title">
-                <i class="icon iconfont icon-lishijilu"/>
+                <i class="icon iconfont icon-lishijilu" />
                 <h2>历史记录总数</h2>
               </div>
             </el-card>
             <el-card shadow="always" class="content star">
               <div class="title">
-                <i class="icon iconfont icon-shoucang"/>
+                <i class="icon iconfont icon-shoucang" />
                 <h2>我的归档总数</h2>
               </div>
             </el-card>
             <el-card shadow="always" class="content most">
               <div class="title">
-                <i class="icon iconfont icon-xiongmaobaohu"/>
+                <i class="icon iconfont icon-xiongmaobaohu" />
                 <h2>识别最多物种</h2>
               </div>
             </el-card>
@@ -53,87 +53,84 @@
             <el-card shadow="always" class="content inference">
               <div class="image-container">
                 <template v-if="!oriUrl">
-                  <el-empty description="请先上传图片" class="image"/>
+                  <el-empty description="请先上传图片" class="image" />
                 </template>
                 <template v-else>
-                  <el-image :src="oriUrl" fit="scale-down" :previewSrcList="[oriUrl]"
-                            class="image" :hide-on-click-modal="true"/>
+                  <el-image :src="oriUrl" fit="scale-down" :previewSrcList="[oriUrl]" class="image"
+                    :hide-on-click-modal="true" />
                 </template>
               </div>
-              <el-divider border-style="dashed"/>
+              <el-divider border-style="dashed" />
               <el-container class="buttons">
                 <el-upload :http-request="uploadImage" :multiple="false" :auto-upload="true"
-                           :before-upload="beforeImageUpload" :on-exceed="onExceed" :show-file-list="false"
-                           class="button">
+                  :before-upload="beforeImageUpload" :on-exceed="onExceed" :show-file-list="false" class="button">
                   <el-button type="primary" class="button">
                     <el-icon>
-                      <UploadFilled/>
+                      <UploadFilled />
                     </el-icon>
                     上传图片
                   </el-button>
                 </el-upload>
                 <el-button type="primary" class="button" @click="inference">
                   <el-icon>
-                    <Aim/>
+                    <Aim />
                   </el-icon>
                   AI 识别
                 </el-button>
                 <el-text class="text">标注框颜色</el-text>
-                <el-color-picker v-model="boxColor"/>
+                <el-color-picker v-model="boxColor" />
                 <el-text class="text">字体颜色</el-text>
-                <el-color-picker v-model="fontColor"/>
+                <el-color-picker v-model="fontColor" />
               </el-container>
             </el-card>
             <el-card shadow="always" class="content result">
               <el-container class="image-results">
                 <template v-if="!detUrl">
-                  <el-empty description="上传图片并识别以获取结果" class="image"/>
+                  <el-empty description="上传图片并识别以获取结果" class="image" />
                 </template>
                 <template v-else>
-                  <el-image :src="detUrl" class="image"
-                            fit="scale-down" :preview-src-list="[detUrl]" :hide-on-click-modal="true"/>
+                  <el-image :src="detUrl" class="image" fit="scale-down" :preview-src-list="[detUrl]"
+                    :hide-on-click-modal="true" />
                 </template>
-                <el-divider direction="vertical" style="height: 100%"/>
+                <el-divider direction="vertical" style="height: 100%" />
                 <template v-if="!segUrl">
-                  <el-empty description="上传图片并识别以获取结果" class="image"/>
+                  <el-empty description="上传图片并识别以获取结果" class="image" />
                 </template>
                 <template v-else>
-                  <el-image :src="segUrl" class="image"
-                            fit="scale-down" :preview-src-list="[segUrl]" :hide-on-click-modal="true"/>
+                  <el-image :src="segUrl" class="image" fit="scale-down" :preview-src-list="[segUrl]"
+                    :hide-on-click-modal="true" />
                 </template>
               </el-container>
-              <el-divider border-style="dotted"/>
-              <el-input id="copy" type="textarea" placeholder="请上传图片并识别以获取文本描述" :rows="3"
-                        :readonly="true"
-                        resize='none'
-                        v-model="caption"/>
-              <el-divider border-style="dotted"/>
+              <el-divider border-style="dotted" />
+              <el-input id="copy" type="textarea" placeholder="请上传图片并识别以获取文本描述" :rows="3" :readonly="true" resize='none'
+                v-model="caption" />
+              <el-divider border-style="dotted" />
               <el-container class="buttons">
                 <el-button type="primary" @click="downloadDetResult">
                   <el-icon>
-                    <Download/>
+                    <Download />
                   </el-icon>
                   下载识别结果
                 </el-button>
                 <el-button type="primary" @click="downloadSegResult">
                   <el-icon>
-                    <Download/>
+                    <Download />
                   </el-icon>
                   下载分割结果
                 </el-button>
                 <el-button type="primary" id="copyBtn" data-clipboard-target="#copy">
                   <el-icon>
-                    <CopyDocument/>
+                    <CopyDocument />
                   </el-icon>
                   复制文本描述
                 </el-button>
                 <el-button type="primary" @click="archiveResult" disabled="true">
                   <el-icon>
                     <template v-if="starBtnVal === '归档成功'">
-                      <StarFilled/>
+                      <StarFilled />
                     </template>
                     <template v-else>
-                      <Star/>
+                      <Star />
                     </template>
                   </el-icon>
                   {{ starBtnVal }}
@@ -143,7 +140,7 @@
           </el-container>
         </el-main>
         <el-footer>
-          <Footer/>
+          <Footer />
         </el-footer>
       </el-container>
     </el-container>
@@ -162,18 +159,19 @@ import {
   StarFilled,
   UploadFilled
 } from "@element-plus/icons";
-import {ElMessage, ElMessageBox} from "element-plus";
-import {logout} from "@/utils/utils.js";
-import {instance} from "@/utils/request.js";
-import {getOssUrl, upload} from "@/utils/oss.js";
-import {beforeImageUpload, onExceed, renameImage, writeUploadRecord} from "@/utils/upload.js";
+import { ElMessage, ElMessageBox } from "element-plus";
+import { logout } from "@/utils/utils.js";
+import { instance } from "@/utils/request.js";
+import { getOssUrl, upload } from "@/utils/oss.js";
+import { beforeImageUpload, onExceed, renameImage, writeUploadRecord } from "@/utils/upload.js";
 import Clipboard from "clipboard";
 
 export default {
   name: 'Home',
-  components: {StarFilled, Star, BellFilled, CopyDocument, Comment, Download, Aim, UploadFilled, Edit},
+  components: { StarFilled, Star, BellFilled, CopyDocument, Comment, Download, Aim, UploadFilled, Edit },
   data() {
     return {
+      uid: 0,
       username: '用户',
       avatarUrl: 'https://oss.lewisliugl.cn/avatar/default.svg',
       currentDate: '',
@@ -211,19 +209,19 @@ export default {
         this.oriUrl = res.url;
         return writeUploadRecord(filename);
       })
-          .then((res) => {
-            this.imageName = res.filename;
-            this.imageId = res.id;
-            ElMessage.success('上传成功');
-            return Promise.resolve('Successfully uploaded image');
-          }).catch((error) => {
-            console.error(error);
-            ElMessage.error('上传失败，请稍后重试');
-            return Promise.reject(error);
-          });
+        .then((res) => {
+          this.imageName = res.filename;
+          this.imageId = res.id;
+          ElMessage.success('上传成功');
+          return Promise.resolve('Successfully uploaded image');
+        }).catch((error) => {
+          console.error(error);
+          ElMessage.error('上传失败，请稍后重试');
+          return Promise.reject(error);
+        });
     },
     inference() {
-      const detectUrl = 'https://fc.lewisliugl.cn/ai/detect';
+      const detectUrl = 'https://ani-sight-lxxgpkpypw.cn-beijing.fcapp.run/invoke';
       const captionUrl = 'https://image-caption-yapmqhwfps.cn-hongkong.fcapp.run'
 
       if (this.imageId === 0 || this.imageName === '') {
@@ -264,8 +262,8 @@ export default {
         });
       }).then((res) => {
         loadingInstance.close();
-        const bboxes = res.bboxes;
-        // TODO: write inference record to database
+        return writeInferenceRecord(this.uid,this.imageName,this.caption);
+      }).then((res) => {
         return getOssUrl(this.imageName.split('.')[0] + '.png', 'masks');
       }).then((res) => {
         this.segUrl = res;
@@ -304,12 +302,11 @@ export default {
     },
     archiveResult() {
       const placeholder = 'https://oss.lewisliugl.cn/assets/placeholder.svg'
-      if (!this.caption && this.segUrl === placeholder && this.detUrl === placeholder) {
-        ElMessage.info('请上传图片并识别以获取结果')
-      } else if (!this.caption || this.segUrl === placeholder || this.detUrl === placeholder) {
-        ElMessage.error('识别结果不完整，归档失败')
+      if (this.oriUrl === placeholder) {
+        ElMessage.warning('请先上传图片并识别');
+        return;
       }
-      // TODO: write archive record to database
+
 
     }
   },
@@ -318,6 +315,9 @@ export default {
     if (user) {
       this.avatarUrl = user.avatar;
       this.username = user.username;
+      this.uid = user.uid;
+      console.log('Print UID')
+      console.log(this.uid);
     }
   }
 }
@@ -325,11 +325,6 @@ const hex2rgb = hex => {
   const bgr = [parseInt(hex.slice(1, 3), 16), parseInt(hex.slice(3, 5), 16), parseInt(hex.slice(5, 7), 16)];
   const rgb = [bgr[2], bgr[1], bgr[0]];
   return `(${rgb.join(',')})`;
-}
-
-// TODO: write inference record to database
-const writeInferenceRecord = () => {
-
 }
 
 const clipboard = new Clipboard('#copyBtn');
@@ -342,6 +337,19 @@ clipboard.on('error', function (e) {
   e.clearSelection();
   ElMessage.info('请上传图片并识别以获取文本描述');
 });
+
+const writeInferenceRecord = (uid, image, caption) => {
+  const formData = new FormData();
+  formData.append('uid', uid);
+  formData.append('image', image);
+  formData.append('caption', caption);
+
+  instance.post('/histories', formData).then((res) => {
+    console.log('Write inference record successfully');
+  }).catch((error) => {
+    console.error(error);
+  })
+}
 </script>
 
 <style scoped>
@@ -353,12 +361,15 @@ clipboard.on('error', function (e) {
 .welcome {
   width: 95%;
   height: 15%;
-  background-color: rgba(243, 246, 253, 0.7); /* 透明度设置为0.7 */
+  background-color: rgba(243, 246, 253, 0.7);
+  /* 透明度设置为0.7 */
 }
 
 .welcome .greeting-container {
-  display: flex; /* 使用 Flexbox 布局 */
-  justify-content: space-between; /* 在容器中平均分布子元素，使它们横向排列 */
+  display: flex;
+  /* 使用 Flexbox 布局 */
+  justify-content: space-between;
+  /* 在容器中平均分布子元素，使它们横向排列 */
 }
 
 .welcome .greeting-container .title {
@@ -411,15 +422,18 @@ clipboard.on('error', function (e) {
 /* 修改后的样式 */
 .overview .most {
   margin-right: 0;
-  background-color: rgba(219, 246, 253, 0.7); /* #DBF6FD，透明度为0.7 */
+  background-color: rgba(219, 246, 253, 0.7);
+  /* #DBF6FD，透明度为0.7 */
 }
 
 .overview .history {
-  background-color: rgba(254, 228, 203, 0.7); /* #FEE4CB，透明度为0.7 */
+  background-color: rgba(254, 228, 203, 0.7);
+  /* #FEE4CB，透明度为0.7 */
 }
 
 .overview .star {
-  background-color: rgba(233, 231, 253, 0.7); /* #E9E7FD，透明度为0.7 */
+  background-color: rgba(233, 231, 253, 0.7);
+  /* #E9E7FD，透明度为0.7 */
 }
 
 
@@ -489,7 +503,7 @@ clipboard.on('error', function (e) {
 .function .result .buttons {
   display: flex;
   justify-content: center;
-//margin-top: 4%;
+  //margin-top: 4%;
 }
 
 .function .result .buttons .el-button {
