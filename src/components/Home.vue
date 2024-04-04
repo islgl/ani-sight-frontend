@@ -29,26 +29,7 @@
             </el-text>
 
           </el-card>
-          <el-container class="overview">
-            <el-card shadow="always" class="content history">
-              <div class="title">
-                <i class="icon iconfont icon-lishijilu" />
-                <h2>历史记录总数</h2>
-              </div>
-            </el-card>
-            <el-card shadow="always" class="content star">
-              <div class="title">
-                <i class="icon iconfont icon-shoucang" />
-                <h2>我的归档总数</h2>
-              </div>
-            </el-card>
-            <el-card shadow="always" class="content most">
-              <div class="title">
-                <i class="icon iconfont icon-xiongmaobaohu" />
-                <h2>识别最多物种</h2>
-              </div>
-            </el-card>
-          </el-container>
+
           <el-container class="function">
             <el-card shadow="always" class="content inference">
               <div class="image-container">
@@ -123,17 +104,6 @@
                     <CopyDocument />
                   </el-icon>
                   复制文本描述
-                </el-button>
-                <el-button type="primary" @click="archiveResult" disabled="true">
-                  <el-icon>
-                    <template v-if="starBtnVal === '归档成功'">
-                      <StarFilled />
-                    </template>
-                    <template v-else>
-                      <Star />
-                    </template>
-                  </el-icon>
-                  {{ starBtnVal }}
                 </el-button>
               </el-container>
             </el-card>
@@ -262,7 +232,13 @@ export default {
         });
       }).then((res) => {
         loadingInstance.close();
-        return writeInferenceRecord(this.uid,this.imageName,this.caption);
+        const bboxes = res.data.bboxes;
+        let species = '';
+        for (const bbox of bboxes) {
+          species += bbox[5] + ', ';
+        }
+        species = species.slice(0, species.length - 2);
+        return writeInferenceRecord(this.uid, this.imageName, this.caption, species);
       }).then((res) => {
         return getOssUrl(this.imageName.split('.')[0] + '.png', 'masks');
       }).then((res) => {
@@ -300,15 +276,6 @@ export default {
       link.href = downloadUrl;
       link.click();
     },
-    archiveResult() {
-      const placeholder = 'https://oss.lewisliugl.cn/assets/placeholder.svg'
-      if (this.oriUrl === placeholder) {
-        ElMessage.warning('请先上传图片并识别');
-        return;
-      }
-
-
-    }
   },
   mounted() {
     const user = JSON.parse(localStorage.getItem('user'));
@@ -316,8 +283,6 @@ export default {
       this.avatarUrl = user.avatar;
       this.username = user.username;
       this.uid = user.uid;
-      console.log('Print UID')
-      console.log(this.uid);
     }
   }
 }
@@ -338,11 +303,12 @@ clipboard.on('error', function (e) {
   ElMessage.info('请上传图片并识别以获取文本描述');
 });
 
-const writeInferenceRecord = (uid, image, caption) => {
+const writeInferenceRecord = (uid, image, caption,species) => {
   const formData = new FormData();
   formData.append('uid', uid);
   formData.append('image', image);
   formData.append('caption', caption);
+  formData.append('species', species);
 
   instance.post('/histories', formData).then((res) => {
     console.log('Write inference record successfully');
@@ -360,19 +326,21 @@ const writeInferenceRecord = (uid, image, caption) => {
 
 .welcome {
   width: 95%;
-  height: 15%;
+  height: 20%;
   background-color: rgba(243, 246, 253, 0.7);
   /* 透明度设置为0.7 */
+
 }
 
 .welcome .greeting-container {
   display: flex;
   /* 使用 Flexbox 布局 */
   justify-content: space-between;
-  /* 在容器中平均分布子元素，使它们横向排列 */
+  /**纵向居中 */
 }
 
 .welcome .greeting-container .title {
+  margin-top: 1%;
   display: flex;
   align-items: center;
 }
@@ -387,59 +355,9 @@ const writeInferenceRecord = (uid, image, caption) => {
   margin-right: 20px;
 }
 
-.overview {
-  width: 95%;
-  height: 15%;
-  margin-top: 1%;
-}
-
-.overview .title {
-  display: flex;
-  align-items: center;
-}
-
-.overview .icon {
-  font-size: 3rem;
-  margin-right: 15px;
-}
-
-.overview h2 {
-  font-size: 1.5rem;
-  font-family: fangyuan, sans-serif;
-}
-
-.overview .content {
-  width: 33%;
-  height: 100%;
-  margin-right: 1%;
-}
-
-.overview .el-card {
-  display: flex;
-  align-items: center;
-}
-
-/* 修改后的样式 */
-.overview .most {
-  margin-right: 0;
-  background-color: rgba(219, 246, 253, 0.7);
-  /* #DBF6FD，透明度为0.7 */
-}
-
-.overview .history {
-  background-color: rgba(254, 228, 203, 0.7);
-  /* #FEE4CB，透明度为0.7 */
-}
-
-.overview .star {
-  background-color: rgba(233, 231, 253, 0.7);
-  /* #E9E7FD，透明度为0.7 */
-}
-
-
 .function {
   width: 95%;
-  height: 65%;
+  height: 75%;
   margin-top: 1%;
 }
 
@@ -454,7 +372,7 @@ const writeInferenceRecord = (uid, image, caption) => {
 }
 
 .function .inference .image-container {
-  height: 35vh;
+  height: 43vh;
   width: auto;
   display: flex;
   justify-content: center;
@@ -470,7 +388,6 @@ const writeInferenceRecord = (uid, image, caption) => {
 .function .result {
   margin-right: 0;
 }
-
 
 .function .inference .buttons {
   display: flex;
@@ -492,7 +409,7 @@ const writeInferenceRecord = (uid, image, caption) => {
 .function .result .image-results {
   display: flex;
   justify-content: space-between;
-  height: 22vh;
+  height: 28vh;
 }
 
 .function .result .image-results .image {

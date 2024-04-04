@@ -6,6 +6,7 @@ import {createRouter, createWebHistory} from 'vue-router'
 import {instance} from '@/utils/request'
 import Setting from "@/components/Setting.vue";
 import NotFound from "@/components/NotFound.vue";
+import History from "@/components/History.vue";
 
 
 const routes = [
@@ -44,6 +45,14 @@ const routes = [
         path: '/setting',
         name: 'setting',
         component: Setting,
+        meta: {
+            requireAuth: true
+        }
+    },
+    {
+        path: '/history',
+        name: 'history',
+        component: History,
         meta: {
             requireAuth: true
         }

@@ -16,7 +16,7 @@
       </el-icon>
       首页
     </el-menu-item>
-    <el-menu-item index="history" route disabled>
+    <el-menu-item index="history" route>
       <el-icon>
         <Management/>
       </el-icon>
