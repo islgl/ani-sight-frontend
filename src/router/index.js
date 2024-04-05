@@ -97,7 +97,6 @@ router.beforeEach((to, from, next) => {
                 }
             }).then(res => {
                 if (res.status === 'success') {
-                    console.log('Token is valid')
                     next()
                 } else {
                     console.warn('Token is invalid')

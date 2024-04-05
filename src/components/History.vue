@@ -50,7 +50,6 @@ import Footer from "@/components/Footer.vue";
 import {instance} from "@/utils/request.js";
 import {ElMessage, ElMessageBox} from "element-plus";
 import {View} from "@element-plus/icons";
-import {getOssUrl} from "@/utils/oss.js";
 
 export default {
   name: "History",
