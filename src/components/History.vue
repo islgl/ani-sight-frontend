@@ -16,12 +16,12 @@
             <el-table-column prop="time" label="识别时间" sortable></el-table-column>
             <el-table-column prop="detection" label="识别结果">
               <template #default="scope">
-                <el-image :src="scope.row.det" loading="lazy"/>
+                <el-image :src="scope.row.det" loading="lazy" style="height: 150px"/>
               </template>
             </el-table-column>
             <el-table-column prop="segmentation" label="分割结果">
               <template #default="scope">
-                <el-image :src="scope.row.seg" loading="lazy"/>
+                <el-image :src="scope.row.seg" loading="lazy" style="height: 150px"/>
               </template>
             </el-table-column>
             <el-table-column prop="archive" label="是否归档">

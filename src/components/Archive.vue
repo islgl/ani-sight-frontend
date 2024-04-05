@@ -9,19 +9,19 @@
       </el-aside>
       <el-container style="width: 88vw">
         <el-main>
-          <el-table :data="filterArchived(histories)" style="width: 100%">
+          <el-table :data="filterArchived(histories)" style="width: 100%" stripe>
             <el-table-column prop="id" label="记录编号" width="180" sortable></el-table-column>
             <el-table-column prop="species" label="识别物种" width="180" sortable></el-table-column>
             <el-table-column prop="caption" label="文本描述"></el-table-column>
             <el-table-column prop="time" label="识别时间" sortable></el-table-column>
             <el-table-column prop="detection" label="识别结果">
               <template #default="scope">
-                <el-image :src="scope.row.det" loading="lazy"/>
+                <el-image :src="scope.row.det" loading="lazy" style="height: 150px"/>
               </template>
             </el-table-column>
             <el-table-column prop="segmentation" label="分割结果">
               <template #default="scope">
-                <el-image :src="scope.row.seg" loading="lazy"/>
+                <el-image :src="scope.row.seg" loading="lazy" style="height: 150px"/>
               </template>
             </el-table-column>
             <el-table-column prop="archive" label="取消归档">
