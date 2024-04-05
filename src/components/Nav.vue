@@ -22,7 +22,7 @@
       </el-icon>
       历史
     </el-menu-item>
-    <el-menu-item index="archive" route disabled>
+    <el-menu-item index="archive" route>
       <el-icon>
         <MessageBox/>
       </el-icon>

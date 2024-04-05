@@ -2,6 +2,7 @@
 /src/assets/fonts
 /src/assets/icons
 ani-sight-*.jar
+db.sql
 
 .vscode
 .idea

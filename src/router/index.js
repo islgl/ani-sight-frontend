@@ -58,6 +58,14 @@ const routes = [
         }
     },
     {
+        path: '/archive',
+        name: 'archive',
+        component: () => import('@/components/Archive.vue'),
+        meta: {
+            requireAuth: true
+        }
+    },
+    {
         path: '/404',
         name: 'notfound',
         component: NotFound,
