@@ -9,13 +9,31 @@
       </el-aside>
       <el-container style="width: 88vw">
         <el-main>
-          <el-table :data="histories" style="width: 100%">
-            <el-table-column prop="id" label="记录编号" width="180"></el-table-column>
-            <el-table-column prop="archived" label="是否归档" width="180"></el-table-column>
-            <el-table-column prop="species" label="识别结果" width="180"></el-table-column>
+          <el-table :data="histories" style="width: 100%" v-loading="loading">
+            <el-table-column prop="id" label="记录编号" width="180" sortable></el-table-column>
+            <el-table-column prop="species" label="识别物种" width="180" sortable></el-table-column>
             <el-table-column prop="caption" label="文本描述"></el-table-column>
-            <el-table-column prop="time" label="识别时间"></el-table-column>
-            <el-table-column prop="detail" label="详情" width="180"></el-table-column>
+            <el-table-column prop="time" label="识别时间" sortable></el-table-column>
+            <el-table-column prop="detection" label="识别结果">
+              <template #default="scope">
+                <el-image :src="scope.row.det" loading="lazy"/>
+              </template>
+            </el-table-column>
+            <el-table-column prop="segmentation" label="分割结果">
+              <template #default="scope">
+                <el-image :src="scope.row.seg" loading="lazy"/>
+              </template>
+            </el-table-column>
+              <el-table-column prop="archive" label="是否归档">
+                <template #default="scope">
+                  <el-switch v-model="scope.row.archived" @change="archiveChange(scope.row.id,scope.row.archived)"/>
+                </template>
+              </el-table-column>
+              <el-table-column prop="delete" label="删除记录">
+                <template #default="scope">
+                  <el-button type="danger" @click="deleteHistory(scope.row.id)">删除</el-button>
+                </template>
+              </el-table-column>
           </el-table>
         </el-main>
         <el-footer>
@@ -30,16 +48,19 @@
 
 import Footer from "@/components/Footer.vue";
 import {instance} from "@/utils/request.js";
+import {ElMessage, ElMessageBox} from "element-plus";
+import {View} from "@element-plus/icons";
+import {getOssUrl} from "@/utils/oss.js";
 
 export default {
   name: "History",
-  components: { Footer },
+  components: {View, Footer},
   data() {
     return {
       uid: 0,
       username: "用户",
       avatarUrl: "https://oss.lewisliugl.cn/avatar/default.svg",
-      histories: []
+      histories: [],
     }
   },
   mounted() {
@@ -51,24 +72,102 @@ export default {
     }
 
     // 获取历史记录
-    const url='/histories?uid='+this.uid
+    const url = '/histories?uid=' + this.uid
+    const loadingInstance = this.$loading({
+      lock: true,
+      text: '正在加载历史记录，请稍候...',
+      background: 'rgba(0, 0, 0, 0.7)',
+    });
     instance.get(url).then(response => {
       const data = response.data;
       for (const item of data) {
         this.histories.push({
           id: item.id,
-          archived: item.star===1 ? '是' : '否',
           species: item.species,
+          archived: item.star === 1,
           caption: item.caption,
-          time: item.timestamp,
-          detail: '详情'
+          time: formatTimestamp(item.timestamp),
+          det: 'https://oss.lewisliugl.cn/labels/' + item.imageName,
+          seg: 'https://oss.lewisliugl.cn/masks/' + item.imageName.replace('.jpg', '.png'),
         });
       }
-      console.log(this.histories)
+      loadingInstance.close();
     }).catch(error => {
+      loadingInstance.close();
       console.log(error);
     });
+  },
+  methods: {
+    archiveChange(id, archived) {
+      // 归档记录
+      if (archived) {
+        const loadingInstance = this.$loading({
+          lock: true,
+          text: '正在归档，请稍候...',
+          background: 'rgba(0, 0, 0, 0.7)',
+        });
+        instance.put('/histories/' + id + '?star=1').then(response => {
+          loadingInstance.close();
+          ElMessage.success('归档成功');
+        }).catch(error => {
+          loadingInstance.close();
+          console.log(error);
+          ElMessage.error('归档失败，请重试');
+        })
+      } else {
+        // 取消归档
+        const loadingInstance = this.$loading({
+          lock: true,
+          text: '正在取消归档，请稍候...',
+          background: 'rgba(0, 0, 0, 0.7)',
+        });
+        instance.put('/histories/' + id + '?star=0').then(response => {
+          loadingInstance.close();
+          ElMessage.success('已取消归档');
+        }).catch(error => {
+          loadingInstance.close();
+          console.log(error);
+          ElMessage.error('取消归档失败，请重试');
+        });
+      }
+    },
+    deleteHistory(id) {
+      ElMessageBox.confirm('此操作将永久删除该记录, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        const loadingInstance = this.$loading({
+          lock: true,
+          text: '正在删除记录，请稍候...',
+          background: 'rgba(0, 0, 0, 0.7)',
+        });
+        instance.delete('/histories/' + id).then(response => {
+          loadingInstance.close();
+          ElMessage.success('删除成功');
+          this.histories = this.histories.filter(item => item.id !== id);
+        }).catch(error => {
+          loadingInstance.close();
+          console.log(error);
+          ElMessage.error('删除失败，请重试');
+        })
+      });
+    }
   }
+}
+
+const formatTimestamp = (timestamp) => {
+  const date = new Date(timestamp);
+
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  const seconds = String(date.getSeconds()).padStart(2, '0');
+
+  return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 }
 </script>
 
