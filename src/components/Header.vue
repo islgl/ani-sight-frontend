@@ -29,9 +29,9 @@ export default {
   data() {
     return {
       logo: "https://oss.lewisliugl.cn/assets/logo-title.svg",
-      version:'v1.5.1',
-      versionTitle:'v 1.5.1 更新内容',
-      versionInfo:'👋 新增用户管理后台 🎉'
+      version:'v1.6.3',
+      versionTitle:'v 1.6.3 更新内容',
+      versionInfo:'👋 新增图片管理后台 🎉'
     }
   },
   props:{
