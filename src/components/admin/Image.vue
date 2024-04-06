@@ -79,10 +79,10 @@ export default {
       <el-container style="width: 88vw">
         <el-main>
           <el-table :data="images" style="width: 100%" stripe>
-            <el-table-column prop="id" label="图片编号" width="150px"/>
-            <el-table-column prop="name" label="文件名"/>
-            <el-table-column prop="user" label="上传用户"/>
-            <el-table-column prop="time" label="上传时间"/>
+            <el-table-column type="index" label="图片编号" width="150px"/>
+            <el-table-column prop="name" label="文件名" sortable/>
+            <el-table-column prop="user" label="上传用户" sortable/>
+            <el-table-column prop="time" label="上传时间" sortable/>
             <el-table-column prop="image" label="图片" width="200px">
               <template #default="scope">
                 <el-image :src="scope.row.image" style="height: 80px"/>

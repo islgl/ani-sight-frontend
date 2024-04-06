@@ -127,15 +127,15 @@ export default {
       <el-container style="width: 88vw">
         <el-main>
           <el-table :data="users" style="width: 100%" stripe>
-            <el-table-column prop="uid" label="UID" width="150px"/>
-            <el-table-column prop="username" label="用户名" width="200px"/>
+            <el-table-column type="index" label="UID" width="150px"/>
+            <el-table-column prop="username" label="用户名" width="200px" sortable/>
             <el-table-column prop="email" label="邮箱" width="250px"/>
             <el-table-column prop="avatar" label="头像" width="200px">
               <template #default="scope">
                 <el-image :src="scope.row.avatar" style="width: 50px; height: 50px"/>
               </template>
             </el-table-column>
-            <el-table-column prop="role" label="角色" width="150px"></el-table-column>
+            <el-table-column prop="role" label="角色" width="150px" sortable></el-table-column>
             <el-table-column prop="action" label="操作">
               <template #default="scope">
                 <el-button type="text" @click="resetPassword(scope.row.uid)">重置密码</el-button>

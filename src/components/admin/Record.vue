@@ -89,7 +89,7 @@ export default {
       <el-container style="width: 88vw">
         <el-main>
           <el-table :data="histories" style="width: 100%" stripe>
-            <el-table-column prop="id" label="记录编号" width="180" sortable></el-table-column>
+            <el-table-column type="index" label="记录编号" width="180"></el-table-column>
             <el-table-column prop="uid" label="用户" width="180" sortable></el-table-column>
             <el-table-column prop="species" label="识别物种" width="180" sortable></el-table-column>
             <el-table-column prop="caption" label="文本描述"></el-table-column>
