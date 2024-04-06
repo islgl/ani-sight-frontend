@@ -7,6 +7,7 @@ import {instance} from '@/utils/request'
 import Setting from "@/components/Setting.vue";
 import NotFound from "@/components/NotFound.vue";
 import History from "@/components/History.vue";
+import {ElMessage} from "element-plus";
 
 
 const routes = [
@@ -66,6 +67,46 @@ const routes = [
         }
     },
     {
+        path: '/admin',
+        name: 'admin',
+        redirect: '/admin/users',
+        meta: {
+            requireAuth: true
+        }
+    },
+    {
+        path: '/admin/users',
+        name: 'users',
+        component: () => import('@/components/admin/User.vue'),
+        meta: {
+            requireAuth: true
+        }
+    },
+    {
+        path: '/admin/records',
+        name: 'records',
+        component: () => import('@/components/admin/Record.vue'),
+        meta: {
+            requireAuth: true
+        }
+    },
+    {
+        path: '/admin/images',
+        name: 'images',
+        component: () => import('@/components/admin/Image.vue'),
+        meta: {
+            requireAuth: true
+        }
+    },
+    {
+        path: '/admin/login',
+        name: 'admin-login',
+        component: () => import('@/components/admin/AdminLogin.vue'),
+        meta: {
+            requireAuth: false
+        }
+    },
+    {
         path: '/404',
         name: 'notfound',
         component: NotFound,
@@ -89,7 +130,11 @@ router.beforeEach((to, from, next) => {
     if (to.meta.requireAuth) {
         const user = JSON.parse(localStorage.getItem('user'))
         if (user === null) {
-            next('/login')
+            if (to.path.startsWith('/admin')) {
+                next('/admin/login')
+            } else {
+                next('/login')
+            }
         } else {
             instance.get('/users/token-valid', {
                 params: {
@@ -97,14 +142,27 @@ router.beforeEach((to, from, next) => {
                 }
             }).then(res => {
                 if (res.status === 'success') {
-                    next()
+                    if (to.path.startsWith('/admin') && user.role !== 'Administrator') {
+                        ElMessage.warning('抱歉，您无权访问该页面')
+                        next('/home');
+                    } else {
+                        next();
+                    }
                 } else {
                     console.warn('Token is invalid')
-                    next('/login')
+                    if (to.path.startsWith('/admin')) {
+                        next('/admin/login')
+                    } else {
+                        next('/login')
+                    }
                 }
             }).catch(err => {
                 console.error(err)
-                next('/login')
+                if (to.path.startsWith('/admin')) {
+                    next('/admin/login')
+                } else {
+                    next('/login')
+                }
             })
         }
     } else {

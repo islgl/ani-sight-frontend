@@ -91,8 +91,6 @@ export default {
         });
       }
       loadingInstance.close();
-      // 将历史记录写入localStorage
-      localStorage.setItem('histories', JSON.stringify(this.histories));
     }).catch(error => {
       loadingInstance.close();
       console.log(error);
