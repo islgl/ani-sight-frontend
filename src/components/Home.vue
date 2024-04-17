@@ -5,7 +5,7 @@
     </el-header>
     <el-container style="height: 92vh">
       <el-aside style="width: 10vw">
-        <Nav active-index="home"></Nav>
+        <Nav active-index="home"/>
       </el-aside>
       <el-container style="width: 88vw">
         <el-main>
@@ -329,7 +329,6 @@ const writeInferenceRecord = (uid, image, caption,species) => {
   height: 20%;
   background-color: rgba(243, 246, 253, 0.7);
   /* 透明度设置为0.7 */
-
 }
 
 .welcome .greeting-container {

@@ -67,6 +67,14 @@ const routes = [
         }
     },
     {
+        path: '/edge',
+        name: 'edge',
+        component: () => import('@/components/Edge.vue'),
+        meta: {
+            requireAuth: true
+        }
+    },
+    {
         path: '/admin',
         name: 'admin',
         redirect: '/admin/users',
