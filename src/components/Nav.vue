@@ -22,12 +22,6 @@
       </el-icon>
       归档记录
     </el-menu-item>
-    <el-menu-item index="edge" route>
-      <el-icon>
-        <CameraFilled />
-      </el-icon>
-      边缘计算
-    </el-menu-item>
     <el-menu-item index="setting" route>
       <el-icon>
         <Tools />
